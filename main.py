@@ -1,7 +1,6 @@
 # import openai
 
-from tui.app import MainPageApp, SuspendingApp
-
+from story_writer.tui.app import MainPageApp
 
 if __name__ == '__main__':
     app = MainPageApp()

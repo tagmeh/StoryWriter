@@ -6,5 +6,3 @@ FIRST_PASS_GENERATION_MODEL = "llama3.1:latest"
 
 
 SECOND_PASS_EDITOR_MODEL = ""
-
-
