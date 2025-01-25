@@ -1,0 +1,34 @@
+Todo:
+- [ ] Refactor code to clean it up and promote structure and organization.
+- 
+- [ ] Add logging module (Separate from logging the llm outputs as json files within the story directories.)
+  - [ ] Add logging to show streamed output.
+  - [ ] Add normal logging >.>
+- 
+- [ ] Capture and log usage data when using LM Studio
+- 
+- [ ] Update story output objects to either combine into a large object, OR remove top level property (won't be able to store model name with output)
+  - [ ] Look into updating the story output objects/dicts to make it easier to save things like characters/locations with their details and make it easier to access them in constant time (vs looping through arrays for name=="steve")
+  - [ ] Change "characters" object in scenes to show name and status and/or motive.
+  - 
+
+---
+Optional - User Interface: Might fall back to a command line usage.
+- [ ] Add TUI (Texual module)
+  - [ ] Welcome Page
+    - Buttons
+      - Create New Story 
+      - Edit Existing Story
+      - Settings
+      - Exit
+  - [ ] Create New Story - Initial User Input Page
+    - TextArea for user input
+    - Buttons
+      - Generate
+      - Back
+  - [ ] Edit Existing Story - Story Select Page
+    - Buttons:
+      - Select
+      - Settings (single story)
+      - Delete (story specific, multi-select?)
+      - Back
