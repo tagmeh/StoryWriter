@@ -6,7 +6,7 @@ import pydantic
 import yaml
 
 from config import prompts
-from src.constants.models import FIRST_PASS_GENERATION_MODEL
+from config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer import response_schemas, utils
 from story_writer.llm import stream_llm
 from story_writer.story_data_model import GeneralData
