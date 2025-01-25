@@ -227,20 +227,20 @@ classic = {
         "exposition": {
             "type": "string"
         },
-        "rising action": {
+        "rising_action": {
             "type": "string"
         },
         "climax": {
             "type": "string"
         },
-        "falling action": {
+        "falling_action": {
             "type": "string"
         },
         "resolution": {
             "type": "string"
         },
     },
-    "required": ["exposition", "rising action", "climax", "falling action", "resolution"]
+    "required": ["exposition", "rising_action", "climax", "falling_action", "resolution"]
 }
 
 seven_point_story_structure = {
@@ -249,34 +249,34 @@ seven_point_story_structure = {
         "hook": {
             "type": "string"
         },
-        "plot point 1": {
+        "plot_turn_1": {
             "type": "string"
         },
-        "pinch point 1": {
+        "pinch_point_1": {
             "type": "string"
         },
-        "mid point": {
+        "mid_point": {
             "type": "string"
         },
-        "pinch point 2": {
+        "pinch_point_2": {
             "type": "string"
         },
-        "plot point 2": {
+        "plot_turn_2": {
             "type": "string"
         },
         "resolution": {
             "type": "string"
         }
     },
-    "required": ["hook", "plot point 1", "pinch point 1", "mid point", "pinch point 2",
-                 "plot point 2", "resolution"]
+    "required": ["hook", "plot_turn_1", "pinch_point_1", "mid_point", "pinch_point_2",
+                 "plot_turn_2", "resolution"]
 }
 
 freytags_pyramid = {
     "type": "object",
     "description": "A story structure for tragic narratives.",
     "properties": {
-        "introduction": {
+        "exposition": {
             "type": "string"
         },
         "rising action": {
@@ -315,7 +315,7 @@ the_heros_journey = {
             "description": "Our hero meets someone who prepares them for what lies ahead.",
             "type": "string"
         },
-        "crossing the first threshold": {
+        "crossing the threshold": {
             "description": "The hero steps out of their comfort zone and enters a ‘new world.’",
             "type": "string"
         },

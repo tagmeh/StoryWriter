@@ -1,8 +1,9 @@
 import json
 from pathlib import Path
-from typing import Optional
 
 
+# TODO: Update settings such that it's passed into the llm call and logged.
+#  Settings might be anything beyond the absolute required inputs, like "stream" and "stream_options".
 def log_step(
         story_root: Path,
         file_name: str,

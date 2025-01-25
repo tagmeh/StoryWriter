@@ -1,52 +1,63 @@
-# def generate_story_structure(client: openai.Client, story_root: Path, story_structure: Optional[StoryStructure] = None):
-#     start = time.time()
-#
-#     story_structure = story_structure or StoryStructure.CLASSIC
-#
-#     # Load story-specific content.
-#     with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-#         story_data = yaml.safe_load(f)
-#
-#     if not story_data["general"]:
-#         raise Exception("General story details do not exist, create a new story before generating the story structure.")
-#
-#     instructions = f"""
-#     Generate a story structure/outline using the following story structure style: {story_structure.value}.
-#     Expand on each point in the story, adding details where appropriate. Avoid dialogue at this stage.
-#
-#     Consider the protagonist's motivations and desires.
-#     What issues does the protagonist run into, how do they overcome them?
-#     Does anyone help or hinder the protagonist?
-#
-#     User Input:
-#     Title: {story_data["general"]['title']}
-#     Genres: {story_data["general"]['genres']}
-#     Themes: {story_data["general"]['themes']}
-#     Synopsis: {story_data["general"]['synopsis']}
-#     """
-#
-#     response_format: dict = story_structure_schema
-#     response_format["json_schema"]["schema"] = get_story_structure_schema(story_structure)
-#
-#     messages = [
-#         {
-#             "role": "system",
-#             "content": GENERAL_SYSTEM_PROMPT
-#         },
-#         {
-#             "role": "user",
-#             "content": instructions
-#         }
-#     ]
-#
-#     content, elapsed, retries = call_llm(client=client, messages=messages, model=FIRST_PASS_GENERATION_MODEL,
-#                                          response_format=response_format)
-#     story_data["structure"] = content
-#
-#     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-#         yaml.dump(story_data, f, default_flow_style=False, sort_keys=False)
-#
-#     file_name = f"generate_story_structure-{retries}" if retries > 0 else f"generate_story_structure"
-#     utils.log_step(story_root=story_root, messages=messages, file_name=file_name,
-#                    model=FIRST_PASS_GENERATION_MODEL,
-#                    settings={}, response_format=response_format, duration=elapsed)
+from pathlib import Path
+
+import yaml
+from openai import Client
+
+from config import prompts
+from config.models import FIRST_PASS_GENERATION_MODEL
+from config.prompts import GENERAL_SYSTEM_PROMPT
+from story_writer import utils
+from story_writer.llm import validated_stream_llm
+from story_writer.response_schemas import story_structure_schema
+from story_writer.story_data_model import StoryData, StoryStructureData
+from story_writer.story_structures import StoryStructure, get_story_structure_schema, get_story_structure_model
+
+
+def generate_story_structure(client: Client, story_root: Path,
+                             story_structure: StoryStructure = StoryStructure.CLASSIC):
+    """
+    Uses the LLM to generate the story structure based on the user's selected story structure.
+
+    :param client: Facilitates LLM connection and communication
+    :param story_root: Path to the directory containing the generated story data
+    :param story_structure: Enum representing the selected story structure
+
+    :return: None (Saves parameters used in the LLM call in the story directory /logs/,
+             updates the story_data.yaml with the structured return data.)
+    """
+    with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
+        story_data = StoryData(**yaml.safe_load(f))
+
+    if not story_data.general:
+        raise Exception("General story details do not exist, create a new story before generating the story structure.")
+
+    model = FIRST_PASS_GENERATION_MODEL
+    instructions = prompts.generate_story_structure_prompt(story_structure, story_data)
+    messages = [
+        {
+            "role": "system",
+            "content": GENERAL_SYSTEM_PROMPT
+        },
+        {
+            "role": "user",
+            "content": instructions
+        }
+    ]
+    response_format: dict = story_structure_schema
+    response_format["json_schema"]["schema"] = get_story_structure_schema(story_structure)
+
+    story_structure_model = get_story_structure_model(story_structure)
+
+    story_structure_data, elapsed = validated_stream_llm(client=client, messages=messages, model=model,
+                                                         response_format=response_format,
+                                                         validation_model=story_structure_model)
+
+    story_structure_data = StoryStructureData(style=story_structure.value, structure=story_structure_data)
+    story_data.structure = story_structure_data
+
+    with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
+        yaml.dump(story_data.model_dump(mode='json'), f, default_flow_style=False,
+                  sort_keys=False)
+
+    utils.log_step(story_root=story_root, messages=messages, file_name="generate_story_structure",
+                   model=model, settings={}, response_format=response_format, duration=elapsed)

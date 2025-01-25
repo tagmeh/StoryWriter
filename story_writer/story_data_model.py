@@ -45,11 +45,87 @@ class GeneralData(BaseModel):
             value = re.sub(":", " -", value)
         return value
 
+    @field_validator('themes', 'genres')
+    @classmethod
+    def clean_themes(cls, value):
+        """
+            Account for some of the weird ways the LLM outputs sometimes.
 
-class StructureData(BaseModel):
+            Examples: ["Self-discovery | Friendship | Redemption"]
+        """
+        for item in value:
+            if "|" in item:
+                sub_values = item.split("|")
+                value.remove(item)
+                value.extend(sub_values)
+
+        # Clean up any whitespace.
+        for item in value:
+            item.strip()
+
+        return value
+
+
+class StoryStructureOptions(BaseModel):
+    ...
+
+
+class ClassicStoryStructure(StoryStructureOptions):
+    exposition: str
+    rising_action: str
+    climax: str
+    falling_action: str
+    resolution: str
+
+
+class SevenPointStoryStructure(StoryStructureOptions):
+    hook: str
+    plot_turn_1: str
+    pinch_point_1: str
+    mid_point: str
+    pinch_point_2: str
+    plot_turn_2: str
+    resolution: str
+
+
+class FreytagsPyramidStoryStructure(StoryStructureOptions):
+    exposition: str
+    rising_action: str
+    climax: str
+    falling_action: str
+    denouement: str
+
+
+class TheHerosJourneyStoryStructure(StoryStructureOptions):
+    the_ordinary_world: str
+    the_call_to_adventure: str
+    the_refusal_of_the_call: str
+    meeting_the_mentor: str
+    crossing_the_threshold: str
+    tests_allies_enemies: str
+    approach_to_the_inmost_cave: str
+    the_ordeal: str
+    seizing_the_sword: str
+    the_road_back: str
+    resurrection: str
+    return_with_the_elixir: str
+
+
+class DanHarmonsStoryCircleStructure(StoryStructureOptions):
+    ...
+
+
+class FichteanCurveStructure(StoryStructureOptions):
+    ...
+
+
+class SaveTheCatStructure(StoryStructureOptions):
+    ...
+
+
+class StoryStructureData(BaseModel):
     style: str  # e.g. "Three-Act Structure"
-    # TODO: Create models for each structure style. Ex. Classic, Hero's Journey, Save the Cat, etc.
-    structure: dict[str, Any]  # e.g. {"Act 1": "Introduction", "Act 2": "Conflict", "Act 3": "Resolution"}
+    structure: StoryStructureOptions
 
 
 class CharacterData(BaseModel):
@@ -76,9 +152,9 @@ class ChapterData(BaseModel):
     scenes: list[SceneData] = []
 
 
-class StoryData(DeferrableModel):
-    general: GeneralData
-    structure: StructureData
-    characters: list[CharacterData]
-    locations: list[str]
-    chapters: list[ChapterData]
+class StoryData(BaseModel):
+    general: GeneralData | None = None
+    structure: StoryStructureData | None = None
+    characters: list[CharacterData] | None = None
+    locations: list[str] | None = None
+    chapters: list[ChapterData] | None = None
