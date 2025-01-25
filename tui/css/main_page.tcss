@@ -1,0 +1,32 @@
+Screen {
+    layout: grid;
+    grid-size: 4 6;
+    grid-rows: 1fr;
+    grid-columns: 1fr;
+    grid-gutter: 1;
+    align: center middle;
+}
+
+#title {
+    text-align: center;
+    column-span: 4;
+}
+
+#subtitle {
+    text-align: center;
+    column-span: 4;
+}
+
+Button {
+    width: 50%;
+    padding: 1;
+}
+
+#create, #edit {
+    column-span: 2;
+}
+
+#settings, #exit {
+    column-span: 4;
+    content-align: center middle;
+}
