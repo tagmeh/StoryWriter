@@ -1,35 +1,20 @@
-# import openai
+from openai import OpenAI
+from story_writer.story.outline import generate_general_story_details
+from story_writer.story.structure import generate_story_structure
+from story_writer.story_structures import StoryStructure
 
-from story_writer.tui.app import MainPageApp
+# from story_writer.tui.app import MainPageApp
+#
+# if __name__ == '__main__':
+#     app = MainPageApp()
+#     app.run()
 
 if __name__ == '__main__':
-    app = MainPageApp()
-    app.run()
+    client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
 
-    # client = openai.Client(base_url="http://localhost:1234/v1", api_key="lm-studio")
-    # response = client.chat.completions.create(
-    #     messages=[
-    #         {
-    #             "role": "user",
-    #             "content": "Say this is a test."
-    #         }
-    #     ],
-    #     model="llama-3.3-70b-instruct"
-    # )
-    # print(response)
+    prompt = """
+        Create a story about a cat with superpowers.
+        """
 
-
-    # import yaml
-    # from pprint import pprint
-    #
-    # with open('../stories/The Arcane Spellbook/inputs/Chapters/chapter1.yaml') as f:
-    #     try:
-    #         pprint(yaml.safe_load(f))
-    #     except yaml.YAMLError as err:
-    #         pprint(err)
-    #
-    # with open('../stories/The Arcane Spellbook/inputs/characters.yaml') as f:
-    #     try:
-    #         pprint(yaml.safe_load(f))
-    #     except yaml.YAMLError as err:
-    #         pprint(err)
+    story_root = generate_general_story_details(client, prompt)
+    generate_story_structure(client, story_root, story_structure=StoryStructure.CLASSIC)
