@@ -268,8 +268,15 @@ seven_point_story_structure = {
             "type": "string"
         }
     },
-    "required": ["hook", "plot_turn_1", "pinch_point_1", "mid_point", "pinch_point_2",
-                 "plot_turn_2", "resolution"]
+    "required": [
+        "hook",
+        "plot_turn_1",
+        "pinch_point_1",
+        "mid_point",
+        "pinch_point_2",
+        "plot_turn_2",
+        "resolution"
+    ]
 }
 
 freytags_pyramid = {
@@ -279,63 +286,63 @@ freytags_pyramid = {
         "exposition": {
             "type": "string"
         },
-        "rising action": {
+        "rising_action": {
             "type": "string"
         },
         "climax": {
             "type": "string"
         },
-        "falling action": {
+        "falling_action": {
             "type": "string"
         },
         "catastrophe": {
             "type": "string"
         },
     },
-    "required": ["exposition", "rising action", "climax", "falling action", "catastrophe"]
+    "required": ["exposition", "rising_action", "climax", "falling_action", "catastrophe"]
 }
 
 the_heros_journey = {
     "type": "object",
     "description": "Campbell’s original structure uses terminology that lends itself well to epic tales of bravery and triumph.",
     "properties": {
-        "the ordinary world": {
+        "the_ordinary_world": {
             "description": "The hero’s everyday life is established.",
             "type": "string"
         },
-        "the call of adventure": {
+        "the_call_of_adventure": {
             "description": "Otherwise known as the inciting incident.",
             "type": "string"
         },
-        "refusal of the call": {
+        "refusal_of_the_call": {
             "description": "For a moment, the hero is reluctant to take on the challenge.",
             "type": "string"
         },
-        "meeting the mentor": {
+        "meeting_the_mentor": {
             "description": "Our hero meets someone who prepares them for what lies ahead.",
             "type": "string"
         },
-        "crossing the threshold": {
+        "crossing_the_threshold": {
             "description": "The hero steps out of their comfort zone and enters a ‘new world.’",
             "type": "string"
         },
-        "tests allies enemies": {
+        "tests_allies_enemies": {
             "description": "Our protagonist faces new challenges, and maybe picks up some new friends.",
             "type": "string"
         },
-        "approach to the inmost cave": {
+        "approach_to_the_inmost_cave": {
             "description": "The hero gets close to their goal.",
             "type": "string"
         },
-        "the ordeal": {
+        "the_ordeal": {
             "description": "The hero meets (and overcomes) their greatest challenge yet.",
             "type": "string"
         },
-        "seizing the sword": {
+        "seizing_the_sword": {
             "description": "The hero obtains something important they were after, and victory is in sight.",
             "type": "string"
         },
-        "the road back": {
+        "the_road_back": {
             "description": "The hero realizes that achieving their goal is not the final hurdle.",
             "type": "string"
         },
@@ -343,14 +350,14 @@ the_heros_journey = {
             "description": "The hero faces their final challenge — a climactic test that hinges on everything they’ve learned over their journey.",
             "type": "string"
         },
-        "return with the elixir": {
+        "return_with_the_elixir": {
             "description": "Having triumphed, our protagonist returns to their old life. ",
             "type": "string"
         }
     },
     "required": ["the ordinary world", "the call of adventure", "refusal of the call", "meeting the mentor",
-                 "crossing the first threshold", "tests allies enemies", "approach to the inmost cave", "the ordeal",
-                 "seizing the sword", "the road back", "resurrection", "return with the elixir", ]
+                 "crossing the first threshold", "tests allies enemies", "approach_to_the_inmost_cave", "the_ordeal",
+                 "seizing_the_sword", "the_road_back", "resurrection", "return_with_the_elixir", ]
 }
 
 dan_harmons_story_circle = {}
