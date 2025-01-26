@@ -9,36 +9,77 @@ from story_writer import story_data_model
 
 class StoryStructure(Enum):
     CLASSIC = "Classic"
+    THREE_ACT_STRUCTURE = "Three Act Story Structure"
+    FIVE_ACT_STRUCTURE = "Five Act Story Structure"
     SEVEN_POINT = "Seven Point Story Structure"
     FREYTAGS_PYRAMID = "Freytag's Pyramid"
     THE_HEROS_JOURNEY = "The Hero's Journey"
     DAN_HARMONS_STORY_CIRCLE = "Dan Harmon's Story Circle"
+    STORY_SPINE = "Story Spine"
     FICHTEAN_CURVE = "Fichtean Curve"
+    IN_MEDIAS_RES = "In Medias Res"
     SAVE_THE_CAT = "Save the Cat Beat Sheet"
 
 
+structure_config = {
+    StoryStructure.CLASSIC: {
+        "schema": response_schemas.classic,
+        "model": story_data_model.ClassicStoryStructure,
+    },
+    StoryStructure.THREE_ACT_STRUCTURE: {
+        "schema": response_schemas.three_act_structure,
+        "model": story_data_model.ThreeActStructure,
+    },
+    StoryStructure.FIVE_ACT_STRUCTURE: {
+        "schema": response_schemas.five_act_structure,
+        "model": story_data_model.FiveActStructure,
+    },
+    StoryStructure.SEVEN_POINT: {
+        "schema": response_schemas.seven_point_story_structure,
+        "model": story_data_model.SevenPointStoryStructure,
+    },
+    StoryStructure.FREYTAGS_PYRAMID: {
+        "schema": response_schemas.freytags_pyramid,
+        "model": story_data_model.FreytagsPyramidStoryStructure,
+    },
+    StoryStructure.THE_HEROS_JOURNEY: {
+        "schema": response_schemas.the_heros_journey,
+        "model": story_data_model.TheHerosJourneyStoryStructure,
+    },
+    StoryStructure.DAN_HARMONS_STORY_CIRCLE: {
+        "schema": response_schemas.dan_harmons_story_circle,
+        "model": story_data_model.DanHarmonsStoryCircleStructure,
+    },
+    StoryStructure.STORY_SPINE: {
+        "schema": response_schemas.story_spine,
+        "model": story_data_model.StorySpine,
+    },
+    StoryStructure.FICHTEAN_CURVE: {
+        "schema": response_schemas.fichtean_curve,
+        "model": story_data_model.FichteanCurveStructure,
+    },
+    StoryStructure.IN_MEDIAS_RES: {
+        "schema": response_schemas.in_medias_res,
+        "model": story_data_model.InMediasRes,
+    },
+    StoryStructure.SAVE_THE_CAT: {
+        "schema": response_schemas.save_the_cat,
+        "model": story_data_model.SaveTheCatStructure,
+    },
+}
+
+
 def get_story_structure_schema(story_structure: StoryStructure) -> dict:
-    print(f'Story Structure: {story_structure.value}')
-    schemas = {
-        StoryStructure.SEVEN_POINT: response_schemas.seven_point_story_structure,
-        StoryStructure.CLASSIC: response_schemas.classic,
-        StoryStructure.FREYTAGS_PYRAMID: response_schemas.freytags_pyramid,
-        StoryStructure.THE_HEROS_JOURNEY: response_schemas.the_heros_journey,
-        StoryStructure.DAN_HARMONS_STORY_CIRCLE: response_schemas.dan_harmons_story_circle,
-        StoryStructure.FICHTEAN_CURVE: response_schemas.fichtean_curve,
-        StoryStructure.SAVE_THE_CAT: response_schemas.save_the_cat,
-    }
-    return schemas.get(story_structure, response_schemas.classic)
+    try:
+        print(f"Story Structure: {story_structure.value}")
+        return structure_config[story_structure]["schema"]
+    except KeyError:
+        raise ValueError(f"Invalid story structure: {story_structure}")
 
 
 def get_story_structure_model(story_structure: StoryStructure) -> Type[BaseModel]:
-    models = {
-        StoryStructure.SEVEN_POINT: story_data_model.SevenPointStoryStructure,
-        StoryStructure.CLASSIC: story_data_model.ClassicStoryStructure,
-        # StoryStructure.FREYTAGS_PYRAMID: story_data_model.FreytagsPyramidData,
-        # StoryStructure.THE_HEROS_JOURNEY: story_data_model.TheHerosJourneyData,
-        # StoryStructure.DAN_HARMONS_STORY_CIRCLE: story_data_model.DanHarmonsStoryCircleData,
-        # StoryStructure.FICHTEAN_CURVE: story_data_model.FichteanCurveData,
-        # StoryStructure.SAVE_THE_CAT: story_data_model.SaveTheCatData,
-    }
-    return models.get(story_structure, story_data_model.ClassicStoryStructure)
+    try:
+        return structure_config[story_structure]["model"]
+    except KeyError:
+        raise ValueError(f"Invalid story structure: {story_structure}")
+

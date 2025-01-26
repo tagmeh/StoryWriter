@@ -1,25 +1,19 @@
-# def expand_location(client: openai.Client, story_dir: Path):
-#     start = time.time()
+# from pathlib import Path
 #
+# import yaml
+# from openai import Client
+#
+# from config.models import FIRST_PASS_GENERATION_MODEL
+# from story_writer.story_data_model import StoryData
+#
+#
+# def expand_location(client: Client, story_dir: Path):
 #     model = FIRST_PASS_GENERATION_MODEL
 #
 #     # Load story-specific content.
 #     with open(story_dir / "overview.yaml", mode="r", encoding="utf-8") as f:
-#         story_overview = yaml.safe_load(f)
-#         if not story_overview:
-#             raise Exception("Story Overview file does not exist, create a new story before generating the structure.")
+#         story_overview = StoryData(**yaml.safe_load(f))
 #
-#     with open(story_dir / "chapters.yaml", mode="r", encoding="utf-8") as f:
-#         story_chapters = yaml.safe_load(f)
-#         if not story_chapters:
-#             raise Exception("Story Chapter file does not exist. Pending what to direct user to do.")
-#     print(story_chapters)
-#
-#     with open(story_dir / "characters.yaml", mode="r", encoding="utf-8") as f:
-#         story_characters = yaml.safe_load(f)
-#         if not story_characters:
-#             raise Exception("Story Characters file does not exist. Pending what to direct user to do.")
-#     print(story_characters)
 #
 #     for chapter in story_chapters['chapters']:
 #         detailed_chapter_characters = []
@@ -92,8 +86,8 @@
 #             }
 #         }
 #     }
-
-
+#
+#
 #     response = client.chat.completions.create(
 #         messages=[
 #             {
