@@ -56,3 +56,34 @@ def generate_story_structure_prompt(story_structure: StoryStructure, story_data:
     Themes: {', '.join(story_data.general.themes)}
     Synopsis: {story_data.general.synopsis}
     """
+
+
+def generate_story_characters_prompt(story_data: StoryData) -> str:
+    """
+
+    :param story_data:
+    :return:
+    """
+    instructions = f"""
+    Generate a list of the characters in this story. Define the protagonist, their allies, love interests, friends,
+    family, enemies, and people who pose as obstacles.
+
+    What are the ages of these characters.
+    Do they have any personality quirks that help define them?
+    What sort of physical features make them stand out to the reader?
+
+    Define as many characters as possible.
+
+    Story Details:
+    Title: {story_data.general.title}
+    Genres: {story_data.general.genres}
+    Themes: {story_data.general.themes}
+    Synopsis: {story_data.general.synopsis}
+
+    Story Structure:
+    """
+    for key, value in story_data.structure.model_dump(mode='python').items():
+        if not key.startswith('_'):
+            instructions += f" {key}: {value}"
+
+    return instructions

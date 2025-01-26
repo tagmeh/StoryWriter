@@ -69,7 +69,7 @@ story_characters_schema = {
                         "description": "Integer or more generic description.",
                         "type": "string"
                     },
-                    "reason in story": {
+                    "role": {
                         "type": "string"
                     },
                     "description": {
@@ -82,7 +82,7 @@ story_characters_schema = {
                 "required": [
                     "name",
                     "age",
-                    "reason in story",
+                    "role",
                     "description",
                     "personality"
                 ]

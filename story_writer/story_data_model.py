@@ -1,7 +1,7 @@
 import re
-from typing import Any, TypeVar, Type, Generic
+from typing import Any, TypeVar, Type, Generic, Annotated, Union
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, AfterValidator
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -26,15 +26,21 @@ class DeferrableModel(BaseModel):
         return DeferredModel(cls, kwargs)
 
 
+def not_empty(value: str) -> str:
+    if value == "":
+        raise ValueError(f"'{value}' must not be empty.")
+    return value
+
+
 class GeneralData(BaseModel):
     """
     A model to represent the general details of a story as defined by the structured output of an LLM.
     This model must match the json schema of the LLM's response_format input.
     """
-    title: str
+    title: Annotated[str, AfterValidator(not_empty)]
     themes: list[str]
     genres: list[str]
-    synopsis: str
+    synopsis: Annotated[str, AfterValidator(not_empty)]
 
     @field_validator('title')
     @classmethod
@@ -47,7 +53,7 @@ class GeneralData(BaseModel):
 
     @field_validator('themes', 'genres')
     @classmethod
-    def clean_themes(cls, value):
+    def clean_arrays(cls, value):
         """
             Account for some of the weird ways the LLM outputs sometimes.
 
@@ -66,11 +72,7 @@ class GeneralData(BaseModel):
         return value
 
 
-class StoryStructureOptions(BaseModel):
-    ...
-
-
-class ClassicStoryStructure(StoryStructureOptions):
+class ClassicStoryStructure(BaseModel):
     exposition: str
     rising_action: str
     climax: str
@@ -78,7 +80,7 @@ class ClassicStoryStructure(StoryStructureOptions):
     resolution: str
 
 
-class SevenPointStoryStructure(StoryStructureOptions):
+class SevenPointStoryStructure(BaseModel):
     hook: str
     plot_turn_1: str
     pinch_point_1: str
@@ -88,7 +90,7 @@ class SevenPointStoryStructure(StoryStructureOptions):
     resolution: str
 
 
-class FreytagsPyramidStoryStructure(StoryStructureOptions):
+class FreytagsPyramidStoryStructure(BaseModel):
     exposition: str
     rising_action: str
     climax: str
@@ -96,7 +98,7 @@ class FreytagsPyramidStoryStructure(StoryStructureOptions):
     denouement: str
 
 
-class TheHerosJourneyStoryStructure(StoryStructureOptions):
+class TheHerosJourneyStoryStructure(BaseModel):
     the_ordinary_world: str
     the_call_to_adventure: str
     the_refusal_of_the_call: str
@@ -111,27 +113,37 @@ class TheHerosJourneyStoryStructure(StoryStructureOptions):
     return_with_the_elixir: str
 
 
-class DanHarmonsStoryCircleStructure(StoryStructureOptions):
+class DanHarmonsStoryCircleStructure(BaseModel):
     ...
 
 
-class FichteanCurveStructure(StoryStructureOptions):
+class FichteanCurveStructure(BaseModel):
     ...
 
 
-class SaveTheCatStructure(StoryStructureOptions):
+class SaveTheCatStructure(BaseModel):
     ...
 
 
 class StoryStructureData(BaseModel):
     style: str  # e.g. "Three-Act Structure"
-    structure: StoryStructureOptions
+    structure: Union[
+        ClassicStoryStructure,
+        SevenPointStoryStructure,
+        FreytagsPyramidStoryStructure,
+        TheHerosJourneyStoryStructure,
+        DanHarmonsStoryCircleStructure,
+        FichteanCurveStructure,
+        SaveTheCatStructure
+    ]
 
 
 class CharacterData(BaseModel):
     name: str
+    age: str
     role: str
     description: str
+    personality: str
 
 
 class SceneData(BaseModel):
@@ -158,3 +170,8 @@ class StoryData(BaseModel):
     characters: list[CharacterData] | None = None
     locations: list[str] | None = None
     chapters: list[ChapterData] | None = None
+
+
+if __name__ == '__main__':
+    test = {"title": "", "themes": ["theme"], "genres": ["genre"], "synopsis": ""}
+    gd = GeneralData(**test)

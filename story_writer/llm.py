@@ -1,7 +1,7 @@
 import json
 import time
 from json import JSONDecodeError
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Union
 
 import pydantic
 from pydantic import BaseModel
@@ -9,7 +9,8 @@ from pydantic import BaseModel
 T = TypeVar("T", bound=BaseModel)
 
 
-def validated_stream_llm(client, messages, model, response_format, validation_model: Type[T], max_retries: int = 5) -> (Type[T], float):
+def validated_stream_llm(client, messages, model, response_format, validation_model: Type[T], max_retries: int = 5
+                         ) -> (Union[Type[T], list[Type[T]]], float):
     max_retries = max_retries
     for attempt in range(max_retries):
         content, elapsed = stream_llm(
@@ -17,8 +18,12 @@ def validated_stream_llm(client, messages, model, response_format, validation_mo
         )
 
         try:
-            # Validate the LLM response data against the pydantic model.
-            valid_model = validation_model(**content)
+            if isinstance(content, dict):
+                valid_model = validation_model(**content)
+            elif isinstance(content, list):
+                valid_model = [validation_model(**item) for item in content]
+            else:
+                raise Exception(f"{content} was neither a list or dict. int/str returns not yet supported.")
             break
 
         except pydantic.ValidationError as err:
@@ -44,7 +49,8 @@ def stream_llm(client, messages, model, response_format):
             model=model,
             response_format=response_format,
             stream=True,
-            stream_options={"include_usage": True}  # Doesn't work for LM Studio?
+            stream_options={"include_usage": True},  # Doesn't work for LM Studio?
+            temperature=0.85
         )
 
         output = ""
@@ -63,8 +69,8 @@ def stream_llm(client, messages, model, response_format):
             retries += 1
             continue
 
-        if content == {}:
-            print(f'No content returned from LLM. "{content}')
+        if content == {} or content == [] or content == "":
+            print(f'No content returned from LLM. "{content}", Retrying...')
             retries += 1
 
         else:
