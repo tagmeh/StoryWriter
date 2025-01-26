@@ -17,9 +17,7 @@ class DeferredModel(Generic[T]):
         return self.type_(**self.kwargs)
 
     def __repr__(self):
-        return (
-            f"{type(self).__name__}(type_={self.type_.__name__}, kwargs={self.kwargs})"
-        )
+        return f"{type(self).__name__}(type_={self.type_.__name__}, kwargs={self.kwargs})"
 
 
 class DeferrableModel(BaseModel):
@@ -113,9 +111,7 @@ class DanHarmonsStoryCircleStructure(StoryStructure):
     search: Annotated[str, AfterValidator(str_not_empty)]
     find: Annotated[str, AfterValidator(str_not_empty)]
     take: Annotated[str, AfterValidator(str_not_empty)]
-    returns: Annotated[
-        str, AfterValidator(str_not_empty)
-    ]  # Normally "return" but it clashes with python's return.
+    returns: Annotated[str, AfterValidator(str_not_empty)]  # Normally "return" but it clashes with python's return.
     change: Annotated[str, AfterValidator(str_not_empty)]
 
 

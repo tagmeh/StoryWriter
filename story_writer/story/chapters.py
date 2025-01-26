@@ -17,9 +17,7 @@ def generate_chapters(client: Client, story_root: Path):
 
     character_seed_str = ""
     for char_dict in [char.dict() for char in story_data.characters]:
-        character_seed_str += ", ".join(
-            [f"{key}: {val}" for key, val in char_dict.items()]
-        )
+        character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
     model = FIRST_PASS_GENERATION_MODEL
     messages = [

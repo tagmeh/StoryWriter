@@ -35,9 +35,7 @@ def generate_story_structure(
         story_data = StoryData(**yaml.safe_load(f))
 
     if not story_data.general:
-        raise Exception(
-            "General story details do not exist, create a new story before generating the story structure."
-        )
+        raise Exception("General story details do not exist, create a new story before generating the story structure.")
 
     model = FIRST_PASS_GENERATION_MODEL
     instructions = generate_story_structure_prompt(story_structure, story_data)
@@ -46,9 +44,7 @@ def generate_story_structure(
         {"role": "user", "content": instructions},
     ]
     response_format: dict = story_structure_schema
-    response_format["json_schema"]["schema"] = get_story_structure_schema(
-        story_structure
-    )
+    response_format["json_schema"]["schema"] = get_story_structure_schema(story_structure)
 
     # Get the pydantic model used to validate the LLM's output.
     story_structure_model = get_story_structure_model(story_structure)
@@ -62,9 +58,7 @@ def generate_story_structure(
         validation_model=story_structure_model,
     )
 
-    story_structure_data = StoryStructureData(
-        style=story_structure.value, structure=story_structure_data
-    )
+    story_structure_data = StoryStructureData(style=story_structure.value, structure=story_structure_data)
 
     story_data.structure = story_structure_data
 

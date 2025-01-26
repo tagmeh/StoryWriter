@@ -55,9 +55,7 @@ def validated_stream_llm(
             elif isinstance(content, list):
                 valid_model = [validation_model(**item) for item in content]
             else:
-                raise Exception(
-                    f"{content} was neither a list or dict. int/str returns not yet supported."
-                )
+                raise Exception(f"{content} was neither a list or dict. int/str returns not yet supported.")
             break
 
         except pydantic.ValidationError as err:
@@ -101,26 +99,18 @@ def stream_llm(
 
         output = ""
         for chunk in response:
-            if (
-                chunk.choices
-            ):  # Last response chunk may not have choices, resulting in an IndexError.
+            if chunk.choices:  # Last response chunk may not have choices, resulting in an IndexError.
                 print(chunk.choices[0].delta.content or "", end="")
                 output += chunk.choices[0].delta.content or ""
-        print(
-            ""
-        )  # Prevents the next print statement from being on the same line as the last chunk.
+        print("")  # Prevents the next print statement from being on the same line as the last chunk.
 
         # String cleanup, pre-json.loads()
         output = remove_directional_single_quotes(output)
         output = remove_end_of_line_indicators(output)
         output = replace_em_dash_with_regular_dash(output)
-        output = (
-            output.strip()
-        )  # Reduces output that's all spaces and tabs into an empty string for validation.
+        output = output.strip()  # Reduces output that's all spaces and tabs into an empty string for validation.
 
-        if (
-            response_format
-        ):  # Expectation is that the output will always be an object. Per structured output specs.
+        if response_format:  # Expectation is that the output will always be an object. Per structured output specs.
             try:
                 content = json.loads(output)
             except JSONDecodeError as err:
