@@ -3,9 +3,8 @@ from pathlib import Path
 import yaml
 from openai import Client
 
-from config import prompts
 from config.models import FIRST_PASS_GENERATION_MODEL
-from config.prompts import GENERAL_SYSTEM_PROMPT
+from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_structure_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_structure_schema
@@ -32,7 +31,7 @@ def generate_story_structure(client: Client, story_root: Path,
         raise Exception("General story details do not exist, create a new story before generating the story structure.")
 
     model = FIRST_PASS_GENERATION_MODEL
-    instructions = prompts.generate_story_structure_prompt(story_structure, story_data)
+    instructions = generate_story_structure_prompt(story_structure, story_data)
     messages = [
         {
             "role": "system",
@@ -46,13 +45,17 @@ def generate_story_structure(client: Client, story_root: Path,
     response_format: dict = story_structure_schema
     response_format["json_schema"]["schema"] = get_story_structure_schema(story_structure)
 
+    # Get the pydantic model used to validate the LLM's output.
     story_structure_model = get_story_structure_model(story_structure)
 
-    story_structure_data, elapsed = validated_stream_llm(client=client, messages=messages, model=model,
-                                                         response_format=response_format,
-                                                         validation_model=story_structure_model)
+    # Call to the LLM, should be able to trust the returned pydantic model.
+    story_structure_data, elapsed = validated_stream_llm(
+        client=client, messages=messages, model=model, response_format=response_format,
+        validation_model=story_structure_model
+    )
 
     story_structure_data = StoryStructureData(style=story_structure.value, structure=story_structure_data)
+
     story_data.structure = story_structure_data
 
     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:

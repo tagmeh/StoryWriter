@@ -4,59 +4,8 @@ and hopefully organizing them better per the process to write a story.
 """
 
 
-#
-#
-# def generate_characters(client: openai.Client, story_root: Path):
-#     # Load story-specific content.
-#     with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-#         story_data = yaml.safe_load(f)
-#
-#     instructions = f"""
-#     Generate a list of the characters in this story. Define the protagonist, their allies, love interests, friends,
-#     family, enemies, and people who pose as obstacles.
-#
-#     What are the ages of these characters.
-#     Do they have any personality quirks that help define them?
-#     What sort of physical features make them stand out to the reader?
-#
-#     Define as many characters as possible.
-#
-#     Story Details:
-#     Title: {story_data['general']['title']}
-#     Genres: {story_data['general']['genres']}
-#     Themes: {story_data['general']['themes']}
-#     Synopsis: {story_data['general']['synopsis']}
-#
-#     Story Structure:
-#     """
-#     for key, value in story_data['structure'].items():
-#         if not key.startswith('_'):
-#             instructions += f" {key}: {value}"
-#
-#     response_format: dict = story_characters_schema
-#
-#     messages = [
-#         {
-#             "role": "system",
-#             "content": GENERAL_SYSTEM_PROMPT
-#         },
-#         {
-#             "role": "user",
-#             "content": instructions
-#         }
-#     ]
-#
-#     content, elapsed, retries = call_llm(client=client, messages=messages, model=FIRST_PASS_GENERATION_MODEL,
-#                                          response_format=response_format)
-#     story_data["characters"] = content
-#
-#     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-#         yaml.dump(story_data, f, default_flow_style=False, sort_keys=False)
-#
-#     file_name = f"generate_characters-{retries}" if retries > 0 else f"generate_characters"
-#     utils.log_step(story_root=story_root, messages=messages, file_name=file_name,
-#                    model=FIRST_PASS_GENERATION_MODEL,
-#                    settings={}, response_format=response_format, duration=elapsed)
+
+
 #
 #
 # def generate_chapters(client: openai.Client, story_root: Path):
@@ -354,17 +303,6 @@ and hopefully organizing them better per the process to write a story.
 # }
 
 # if __name__ == '__main__':
-    # client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
-    #
-    # prompt = """
-    # Create a story about a cat with superpowers.
-    # """
-    #
-    # current_story = "Whisker's Awakening"
-    # story_path = story_root = Path(f"{Path(__file__).parents[1]}/stories/{current_story}")
-
-    # story_path = expand_initial_prompt(client=client, user_prompt=prompt.strip())
-    # generate_story_structure(client=client, story_root=story_path, story_structure=StoryStructure.SEVEN_POINT)
     # generate_characters(client=client, story_root=story_path)
     # generate_chapters(client=client, story_root=story_path)
     # generate_scenes_for_chapter(client=client, story_root=story_path)
