@@ -1,4 +1,4 @@
-from story_writer.story_data_model import StoryData
+from story_writer.story_data_model import StoryData, ChapterData
 from story_writer.story_structures import StoryStructure
 
 GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character" \
@@ -52,8 +52,8 @@ def generate_story_structure_prompt(story_structure: StoryStructure, story_data:
 
     User Input:
     Title: {story_data.general.title}
-    Genres: {', '.join(story_data.general.genres)}
-    Themes: {', '.join(story_data.general.themes)}
+    Themes: {", ".join(story_data.general.themes)}
+    Genre: {", ".join(story_data.general.genres)}
     Synopsis: {story_data.general.synopsis}
     """
 
@@ -76,8 +76,8 @@ def generate_story_characters_prompt(story_data: StoryData) -> str:
 
     Story Details:
     Title: {story_data.general.title}
-    Genres: {story_data.general.genres}
-    Themes: {story_data.general.themes}
+    Themes: {", ".join(story_data.general.themes)}
+    Genre: {", ".join(story_data.general.genres)}
     Synopsis: {story_data.general.synopsis}
 
     Story Structure:
@@ -87,3 +87,58 @@ def generate_story_characters_prompt(story_data: StoryData) -> str:
             instructions += f" {key}: {value}"
 
     return instructions
+
+
+def generate_story_chapters_prompt(story_data: StoryData) -> str:
+    """
+
+    :param story_data: 
+    :return: 
+    """
+    instructions = f"""
+    Generate between 5 and 10 high-level chapters. Chapters will be broken up into scenes in the future, so these 
+    chapters should be considered more higher level or more generic. Use the Title, Genres, Themes,
+    general story synopsis, and story structure/outline to generate a number 
+    of chapters. Chapters should span from the beginning to the end of the story. 
+
+    Define the location the chapter takes place in.
+    Define which characters feature in each chapter.
+    What are the statuses of each character (ie, deceased, transformed, asleep, dazed, etc).
+    Define which story structure point the chapter covers. 
+    Multiple chapters can cover the same story structure parts.
+
+    Story Details:
+    Title: {story_data.general.title}
+    Themes: {", ".join(story_data.general.themes)}
+    Genre: {", ".join(story_data.general.genres)}
+    Synopsis: {story_data.general.synopsis}
+
+    Story Structure/Outline:
+    Structure:
+    """
+    for key, value in story_data.structure.model_dump(mode='python').items():
+        instructions += f" {key}: {value}"
+
+    return instructions
+
+
+def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
+    return f"""
+    Generate at least 5 expanded scenes, in order, for this chapter. Go into more detail, describing
+    the story in more detail, encapsulated within the scene. Output the location the scene takes
+    place in, the characters in the scene, and the story beats detailing the events happening.
+    Avoid dialogue, if a character speaks, detail what they say without quotes. IE. Jeff greeted his friends.
+
+    Themes: {", ".join(story_data.general.themes)}
+    Genre: {", ".join(story_data.general.genres)}
+    Synopsis: {story_data.general.synopsis}
+
+    Chapter Number: {chapter.chapter_number}
+    Chapter Title: {chapter.title}
+    Chapter Story Structure reference: {chapter.story_structure_point}
+    Characters: {", ".join([f"{char.name}: {char.status}" for char in [char for char in chapter.characters]])}
+    Locations: {chapter.location}
+    Synopsis: {chapter.synopsis}
+    """
+
+

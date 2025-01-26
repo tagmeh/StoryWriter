@@ -1,47 +1,39 @@
-def generate_scenes_for_chapter(client: openai.Client, story_root: Path):
+from pathlib import Path
+
+import yaml
+from openai import Client
+
+from config.models import FIRST_PASS_GENERATION_MODEL
+from config.prompts import GENERAL_SYSTEM_PROMPT, \
+    generate_story_chapter_scene_prompt
+from config.story_settings import SCENES_PER_CHAPTER_RETRY_COUNT
+from story_writer import utils
+from story_writer.llm import validated_stream_llm
+from story_writer.response_schemas import story_chapter_scene_schema
+from story_writer.story_data_model import StoryData, SceneData
+
+
+def generate_scenes_for_chapter(client: Client, story_root: Path):
     """
     For each chapter, generate a few scenes based on the chapter synopsis, location, and characters.
     """
     # Load story-specific content.
     with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-        story_data = yaml.safe_load(f)
+        story_data = StoryData(**yaml.safe_load(f))
 
     # Generate a non-json string block to seed the context before each scene.
-    story_characters_str = ""
-    for character in story_data['characters']:
-        for key, val in character.items():
-            story_characters_str += f"{key}: {val}\n"
-        story_characters_str += "\n"
+    character_seed_str = ""
+    for char_dict in [char.dict() for char in story_data.characters]:
+        character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
-    story_structure_str = "\n".join(
-        [f"{key}: {val}" for key, val in story_data['structure'].items() if not key == 'model'])
-
-    pre_generation_seed_context = f"""
-        Characters: {story_characters_str}
-        Story Structure/Outline: {story_structure_str}
-    """
+    story_structure_seed_str = "\n".join(
+        [f"{key}: {val}" for key, val in story_data.structure.model_dump(mode='python').items()]
+    )
     # End of context-seeding instructions
 
-    for chapter in story_data['chapters']:
-        instructions = f"""
-        Generate at least 5 expanded scenes, in order, for this chapter. Go into more detail, describing
-        the story in more detail, encapsulated within the scene. Output the location the scene takes
-        place in, the characters in the scene, and the story beats detailing the events happening.
-
-        Story Themes: {story_data['general']['themes']}
-        Story Genre: {" ,".join(story_data['general']['genres'])}
-        Story Synopsis: {" ,".join(story_data['general']['synopsis'])}
-
-        Chapter Number: {chapter['chapter number']}
-        Chapter Title: {chapter['title']}
-        Chapter Story Structure reference: {chapter['story structure point']}
-        Characters: {" ,".join(chapter['characters'])}
-        Locations: {" ,".join(chapter['location'])}
-        Synopsis: {chapter["synopsis"]}
-        """
-
-        response_format: dict = story_chapter_scene_schema
-
+    model = FIRST_PASS_GENERATION_MODEL
+    for chapter in story_data.chapters:
+        print(f'Generating scenes for chapter {chapter.chapter_number}.')
         messages = [
             {
                 "role": "system",
@@ -49,28 +41,33 @@ def generate_scenes_for_chapter(client: openai.Client, story_root: Path):
             },
             {
                 "role": "user",
-                "content": pre_generation_seed_context
+                "content": f"Characters: \n{character_seed_str}\nStory Structure/Outline: {story_structure_seed_str}"
             },
             {
                 "role": "user",
-                "content": instructions
+                "content": generate_story_chapter_scene_prompt(story_data, chapter)
             }
         ]
+        response_format: dict = story_chapter_scene_schema
 
-        while True:
-            content, elapsed, retries = call_llm(client=client, messages=messages, model=FIRST_PASS_GENERATION_MODEL,
-                                                 response_format=response_format)
+        max_retries = SCENES_PER_CHAPTER_RETRY_COUNT
+        for attempts in range(max_retries):
+            content, elapsed = validated_stream_llm(
+                client=client, messages=messages, model=model,
+                response_format=response_format, validation_model=SceneData)
 
             if len(content) > 4:
-                content["chapter number"] = chapter["chapter number"]
+                print(f"LLM returned fewer than 4 scenes for chapter {chapter.chapter_number}. Retry...")
                 break
+        else:
+            raise Exception(f"Failed to generate at least 4 scenes per chapter {chapter.chapter_number} "
+                            f"in {max_retries} attempts.")
 
-        chapter["scenes"] = content
+        chapter.scenes = content
 
         with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-            yaml.dump(story_data, f, default_flow_style=False, sort_keys=False)
+            yaml.dump(story_data.model_dump(mode='python'), f, default_flow_style=False, sort_keys=False)
 
-        file_name = f"generate_scenes_for_chapter_{chapter['chapter number']}-{retries}" if retries > 0 else f"generate_scenes_for_chapter_{chapter['chapter number']}"
+        file_name = f"generate_scenes_for_chapter_{chapter.chapter_number}"
         utils.log_step(story_root=story_root, messages=messages, file_name=file_name,
-                       model=FIRST_PASS_GENERATION_MODEL,
-                       settings={}, response_format=response_format, duration=elapsed)
+                       model=model, settings={}, response_format=response_format, duration=elapsed)
