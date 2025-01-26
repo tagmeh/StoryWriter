@@ -10,7 +10,7 @@ class MainPageApp(App[str]):
     SUB_TITLE = "Landing page for StoryWriter"
 
     def on_mount(self) -> None:
-        """ Updates the TUI settings on load. """
+        """Updates the TUI settings on load."""
         self.screen.styles.background = "black"
 
     def compose(self) -> ComposeResult:
@@ -37,6 +37,6 @@ class SuspendingApp(App[None]):
             system("nano 'stories/{story_name}/inputs/system_prompt.txt'")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = SuspendingApp()
     app.run()

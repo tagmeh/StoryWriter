@@ -18,26 +18,36 @@ def generate_characters(client: Client, story_root: Path):
     model = FIRST_PASS_GENERATION_MODEL
     instructions = generate_story_characters_prompt(story_data=story_data)
     messages = [
-        {
-            "role": "system",
-            "content": GENERAL_SYSTEM_PROMPT
-        },
-        {
-            "role": "user",
-            "content": instructions
-        }
+        {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
+        {"role": "user", "content": instructions},
     ]
     response_format: dict = story_characters_schema
 
     # Todo: Potentially add a "Have enough characters" validator, if not, rerun validated_stream_llm
     content, elapsed = validated_stream_llm(
-        client=client, messages=messages, model=model, response_format=response_format, validation_model=CharacterData
+        client=client,
+        messages=messages,
+        model=model,
+        response_format=response_format,
+        validation_model=CharacterData,
     )
 
     story_data.characters = content
 
     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-        yaml.dump(story_data.model_dump(mode='json'), f, default_flow_style=False, sort_keys=False)
+        yaml.dump(
+            story_data.model_dump(mode="json"),
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+        )
 
-    utils.log_step(story_root=story_root, messages=messages, file_name="generate_characters",
-                   model=model, settings={}, response_format=response_format, duration=elapsed)
+    utils.log_step(
+        story_root=story_root,
+        messages=messages,
+        file_name="generate_characters",
+        model=model,
+        settings={},
+        response_format=response_format,
+        duration=elapsed,
+    )

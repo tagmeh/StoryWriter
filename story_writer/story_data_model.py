@@ -7,7 +7,7 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class DeferredModel(Generic[T]):
-    """ https://github.com/pydantic/pydantic/issues/559#issuecomment-519686409 """
+    """https://github.com/pydantic/pydantic/issues/559#issuecomment-519686409"""
 
     def __init__(self, type_: Type[T], kwargs: dict[str, Any]):
         self.type_ = type_
@@ -17,7 +17,9 @@ class DeferredModel(Generic[T]):
         return self.type_(**self.kwargs)
 
     def __repr__(self):
-        return f"{type(self).__name__}(type_={self.type_.__name__}, kwargs={self.kwargs})"
+        return (
+            f"{type(self).__name__}(type_={self.type_.__name__}, kwargs={self.kwargs})"
+        )
 
 
 class DeferrableModel(BaseModel):
@@ -27,7 +29,7 @@ class DeferrableModel(BaseModel):
 
 
 def str_not_empty(value: str) -> str:
-    """ Prevents empty strings from being valid when requiring a string input. """
+    """Prevents empty strings from being valid when requiring a string input."""
     if value == "":
         raise ValueError(f"'{value}' must not be empty.")
     return value
@@ -37,6 +39,7 @@ class StoryStructure(BaseModel):
     """
     Parent to all the story structure types.
     """
+
     # Todo: Identify a way to generate a list of types of the classes that subclass StoryStructure to
     #  dynamically update the StoryStructureData.structure property. If possible.++
     ...
@@ -110,7 +113,9 @@ class DanHarmonsStoryCircleStructure(StoryStructure):
     search: Annotated[str, AfterValidator(str_not_empty)]
     find: Annotated[str, AfterValidator(str_not_empty)]
     take: Annotated[str, AfterValidator(str_not_empty)]
-    returns: Annotated[str, AfterValidator(str_not_empty)]  # Normally "return" but it clashes with python's return.
+    returns: Annotated[
+        str, AfterValidator(str_not_empty)
+    ]  # Normally "return" but it clashes with python's return.
     change: Annotated[str, AfterValidator(str_not_empty)]
 
 
@@ -163,32 +168,34 @@ class SaveTheCatStructure(StoryStructure):
 
 # End of the Story Structure section
 
+
 class GeneralData(BaseModel):
     """
     A model to represent the general details of a story as defined by the structured output of an LLM.
     This model must match the json schema of the LLM's response_format input.
     """
+
     title: Annotated[str, AfterValidator(str_not_empty)]
     themes: list[Annotated[str, AfterValidator(str_not_empty)]]
     genres: list[Annotated[str, AfterValidator(str_not_empty)]]
     synopsis: Annotated[str, AfterValidator(str_not_empty)]
 
-    @field_validator('title')
+    @field_validator("title")
     @classmethod
     def clean_title(cls, value):
         value.strip()
         if ":" in value:
-            """ Windows directories cannot contain colons (:). """
+            """Windows directories cannot contain colons (:)."""
             value = re.sub(":", " -", value)
         return value
 
-    @field_validator('themes', 'genres')
+    @field_validator("themes", "genres")
     @classmethod
     def clean_arrays(cls, value):
         """
-            Account for some of the weird ways the LLM outputs sometimes.
+        Account for some of the weird ways the LLM outputs sometimes.
 
-            Examples: ["Self-discovery | Friendship | Redemption"]
+        Examples: ["Self-discovery | Friendship | Redemption"]
         """
         for item in value:
             if "|" in item:

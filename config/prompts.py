@@ -1,8 +1,7 @@
 from story_writer.story_data_model import StoryData, ChapterData
 from story_writer.story_structures import StoryStructure
 
-GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character" \
-                        "defining details to fill out the story."
+GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character defining details to fill out the story."
 
 
 def expand_user_input_prompt(user_input: str) -> str:
@@ -34,7 +33,9 @@ def expand_user_input_prompt(user_input: str) -> str:
     """
 
 
-def generate_story_structure_prompt(story_structure: StoryStructure, story_data: StoryData) -> str:
+def generate_story_structure_prompt(
+    story_structure: StoryStructure, story_data: StoryData
+) -> str:
     """
     Returns a prompt to direct the LLM to generate a story structure based on the story data provided.
 
@@ -82,8 +83,8 @@ def generate_story_characters_prompt(story_data: StoryData) -> str:
 
     Story Structure:
     """
-    for key, value in story_data.structure.model_dump(mode='python').items():
-        if not key.startswith('_'):
+    for key, value in story_data.structure.model_dump(mode="python").items():
+        if not key.startswith("_"):
             instructions += f" {key}: {value}"
 
     return instructions
@@ -92,8 +93,8 @@ def generate_story_characters_prompt(story_data: StoryData) -> str:
 def generate_story_chapters_prompt(story_data: StoryData) -> str:
     """
 
-    :param story_data: 
-    :return: 
+    :param story_data:
+    :return:
     """
     instructions = f"""
     Generate between 5 and 10 high-level chapters. Chapters will be broken up into scenes in the future, so these 
@@ -116,13 +117,15 @@ def generate_story_chapters_prompt(story_data: StoryData) -> str:
     Story Structure/Outline:
     Structure:
     """
-    for key, value in story_data.structure.model_dump(mode='python').items():
+    for key, value in story_data.structure.model_dump(mode="python").items():
         instructions += f" {key}: {value}"
 
     return instructions
 
 
-def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
+def generate_story_chapter_scene_prompt(
+    story_data: StoryData, chapter: ChapterData
+) -> str:
     return f"""
     Generate at least 5 expanded scenes, in order, for this chapter. Go into more detail, describing
     the story in more detail, encapsulated within the scene. Output the location the scene takes
@@ -140,5 +143,3 @@ def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterD
     Locations: {chapter.location}
     Synopsis: {chapter.synopsis}
     """
-
-
