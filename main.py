@@ -16,8 +16,8 @@ from story_writer.story_structures import StoryStructure
 #     app = MainPageApp()
 #     app.run()
 
-if __name__ == '__main__':
-    client = OpenAI(base_url="http://127.0.0.1:1234/v1", api_key="lm-studio")
+if __name__ == "__main__":
+    client = OpenAI(base_url="http://127.0.0.1:1234/v1", api_key="lm studio")
 
     prompt = """
         Create a story about a cat with superpowers. 

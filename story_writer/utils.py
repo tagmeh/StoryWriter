@@ -5,13 +5,13 @@ from pathlib import Path
 # TODO: Update settings such that it's passed into the llm call and logged.
 #  Settings might be anything beyond the absolute required inputs, like "stream" and "stream_options".
 def log_step(
-        story_root: Path,
-        file_name: str,
-        model: str,
-        messages: list,
-        settings: dict,
-        response_format: dict,
-        duration: float,
+    story_root: Path,
+    file_name: str,
+    model: str,
+    messages: list,
+    settings: dict,
+    response_format: dict,
+    duration: float,
 ):
     """
     Generates logs per-story in order to inspect the inputs and outputs of the LLM calls, per function.

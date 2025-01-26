@@ -82,4 +82,3 @@ def get_story_structure_model(story_structure: StoryStructure) -> Type[BaseModel
         return structure_config[story_structure]["model"]
     except KeyError:
         raise ValueError(f"Invalid story structure: {story_structure}")
-
