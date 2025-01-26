@@ -23,15 +23,10 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
     # Generate a non-json string block to seed the context before each scene.
     character_seed_str = ""
     for char_dict in [char.dict() for char in story_data.characters]:
-        character_seed_str += ", ".join(
-            [f"{key}: {val}" for key, val in char_dict.items()]
-        )
+        character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
     story_structure_seed_str = "\n".join(
-        [
-            f"{key}: {val}"
-            for key, val in story_data.structure.model_dump(mode="python").items()
-        ]
+        [f"{key}: {val}" for key, val in story_data.structure.model_dump(mode="python").items()]
     )
     # End of context-seeding instructions
 
@@ -62,9 +57,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             )
 
             if len(content) > 4:
-                print(
-                    f"LLM returned fewer than 4 scenes for chapter {chapter.chapter_number}. Retry..."
-                )
+                print(f"LLM returned fewer than 4 scenes for chapter {chapter.chapter_number}. Retry...")
                 break
         else:
             raise Exception(

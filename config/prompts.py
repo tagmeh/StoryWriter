@@ -33,9 +33,7 @@ def expand_user_input_prompt(user_input: str) -> str:
     """
 
 
-def generate_story_structure_prompt(
-    story_structure: StoryStructure, story_data: StoryData
-) -> str:
+def generate_story_structure_prompt(story_structure: StoryStructure, story_data: StoryData) -> str:
     """
     Returns a prompt to direct the LLM to generate a story structure based on the story data provided.
 
@@ -123,9 +121,7 @@ def generate_story_chapters_prompt(story_data: StoryData) -> str:
     return instructions
 
 
-def generate_story_chapter_scene_prompt(
-    story_data: StoryData, chapter: ChapterData
-) -> str:
+def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
     return f"""
     Generate at least 5 expanded scenes, in order, for this chapter. Go into more detail, describing
     the story in more detail, encapsulated within the scene. Output the location the scene takes
