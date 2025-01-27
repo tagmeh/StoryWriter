@@ -38,7 +38,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/
-    story_root = Path(f"{project_root}/stories/{general_story_data.title} - {datetime.now().strftime('%Y%m%d%H%M%S')}")
+    story_root = Path(f"{project_root}/stories/{general_story_data.title} - {datetime.now().timestamp() * 1000:.0f}")
     story_root.mkdir(parents=True, exist_ok=True)
 
     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:

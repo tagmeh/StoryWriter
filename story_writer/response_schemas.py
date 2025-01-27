@@ -102,7 +102,6 @@ story_chapters_schema = {
                 "type": "object",
                 "properties": {
                     "title": {"type": "string"},
-                    "chapter_number": {"type": "integer"},
                     "story_structure_point": {
                         "description": "The relevant story structure point for this chapter.",
                         "type": "string",
@@ -128,7 +127,6 @@ story_chapters_schema = {
                 },
                 "required": [
                     "title",
-                    "chapter_number",
                     "story_structure_point",
                     "location",
                     "characters",
@@ -180,7 +178,6 @@ story_chapter_scene_schema = {
                 },
                 "required": [
                     "title",
-                    "scene_number",
                     "characters",
                     "location",
                     "story_beats",

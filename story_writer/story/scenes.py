@@ -25,14 +25,13 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
     for char_dict in [char.dict() for char in story_data.characters]:
         character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
-    story_structure_seed_str = "\n".join(
-        [f"{key}: {val}" for key, val in story_data.structure.model_dump(mode="python").items()]
-    )
-    # End of context-seeding instructions
-
     model = FIRST_PASS_GENERATION_MODEL
     for chapter in story_data.chapters:
-        print(f"Generating scenes for chapter {chapter.chapter_number}.")
+        story_structure_seed_str = f"{story_data.structure.style}\n" \
+                                   f"{chapter.story_structure_point} - " \
+                                   f"{story_data.structure.structure.model_dump(mode='python').get(chapter.story_structure_point.replace(' ', '_').lower(), 'Chapter story structure point not found in generated story structure.')}"
+
+        print(f"Generating scenes for chapter {chapter.number}.")
         messages = [
             {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
             {
@@ -57,13 +56,16 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             )
 
             if len(content) > 4:
-                print(f"LLM returned fewer than 4 scenes for chapter {chapter.chapter_number}. Retry...")
+                print(f"LLM returned fewer than 4 scenes for chapter {chapter.number}. Retry...")
                 break
         else:
             raise Exception(
-                f"Failed to generate at least 4 scenes per chapter {chapter.chapter_number} "
+                f"Failed to generate at least 4 scenes per chapter {chapter.number} "
                 f"in {max_retries} attempts."
             )
+
+        for count, scene in enumerate(content):
+            scene.number = count
 
         chapter.scenes = content
 
@@ -75,7 +77,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
                 sort_keys=False,
             )
 
-        file_name = f"generate_scenes_for_chapter_{chapter.chapter_number}"
+        file_name = f"generate_scenes_for_chapter_{chapter.number}"
         utils.log_step(
             story_root=story_root,
             messages=messages,
