@@ -238,6 +238,7 @@ class ChapterCharacterData(BaseModel):
 
 class SceneData(BaseModel):
     summary: Annotated[str, AfterValidator(str_not_empty)]
+    number: int | None = None  # This is added manually. LLMs don't always count in order.
     characters: list[ChapterCharacterData]
     location: Annotated[str, AfterValidator(str_not_empty)]
     story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
@@ -245,7 +246,7 @@ class SceneData(BaseModel):
 
 class ChapterData(BaseModel):
     title: Annotated[str, AfterValidator(str_not_empty)]
-    chapter_number: int
+    number: int | None = None  # This is added manually. LLMs don't always count in order.
     story_structure_point: Annotated[str, AfterValidator(str_not_empty)]
     location: Annotated[str, AfterValidator(str_not_empty)]
     characters: list[ChapterCharacterData]

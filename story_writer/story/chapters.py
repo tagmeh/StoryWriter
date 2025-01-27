@@ -38,6 +38,9 @@ def generate_chapters(client: Client, story_root: Path):
         validation_model=ChapterData,
     )
 
+    for count, chapter in enumerate(content):
+        chapter.number = count
+
     story_data.chapters = content
 
     with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:

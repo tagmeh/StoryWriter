@@ -36,12 +36,13 @@ def validated_stream_llm(
     messages,
     model,
     validation_model: Type[T],
-    response_format: str | None = None,
+    response_format: dict | None = None,
     max_retries: int = LLM_INVALID_OUTPUT_RETRY_COUNT,
 ) -> (Union[Type[T], list[Type[T]]], float):
     start = time.time()
     max_retries = max_retries
-    for attempt in range(max_retries):
+    attempt = 0
+    while attempt < max_retries:
         content = stream_llm(
             client=client,
             messages=messages,
@@ -56,6 +57,7 @@ def validated_stream_llm(
                 valid_model = [validation_model(**item) for item in content]
             else:
                 raise Exception(f"{content} was neither a list or dict. int/str returns not yet supported.")
+            attempt = 0
             break
 
         except pydantic.ValidationError as err:
@@ -84,10 +86,9 @@ def stream_llm(
     retries = 0
     while retries < max_retries:
 
-        for message in messages:
-            pprint(message["content"].replace("\n", ""))
+        for count, message in enumerate(messages):
+            print(f"{message['role']} - Message: {count}\n {message['content']}\n")
 
-        time.sleep(1)
         response = client.chat.completions.create(
             messages=messages,
             model=model,
@@ -129,7 +130,8 @@ def stream_llm(
         else:
             return content
 
-    if retries >= max_retries:
+    # if retries >= max_retries:
+    else:
         print(f"Failed to get any data from the LLM in {retries} attempts.")
 
 
