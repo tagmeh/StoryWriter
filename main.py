@@ -10,7 +10,7 @@ from story_writer.story.structure import generate_story_structure
 if __name__ == "__main__":
     client = OpenAI(base_url="http://127.0.0.1:1234/v1", api_key="lm studio")
 
-    prompt = """Create a story about a cat who developers superpowers."""
+    prompt = """Create a story about a cat who develops superpowers."""
 
     # current_story = "Kilometer Kicker - One-Clawed Triumph - 20250125201724"
     # story_path = story_root = Path(f"stories/{current_story}")

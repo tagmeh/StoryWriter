@@ -38,7 +38,7 @@ def generate_chapters(client: Client, story_root: Path):
     )
 
     for count, chapter in enumerate(content):
-        chapter.number = count
+        chapter.number = count + 1  # enumerate is zero-based
 
     story_data.chapters = content
 
