@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import yaml
 from openai import Client
 
 from config.models import FIRST_PASS_GENERATION_MODEL
@@ -11,9 +10,10 @@ from story_writer.response_schemas import story_structure_schema
 from story_writer.story_data_model import StoryData, StoryStructureData
 from story_writer.story_structures import (
     StoryStructure,
-    get_story_structure_schema,
     get_story_structure_model,
+    get_story_structure_schema,
 )
+from story_writer.utils import load_story_data, save_story_data
 
 
 def generate_story_structure(
@@ -31,8 +31,7 @@ def generate_story_structure(
     :return: None (Saves parameters used in the LLM call in the story directory /logs/,
              updates the story_data.yaml with the structured return data.)
     """
-    with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-        story_data = StoryData(**yaml.safe_load(f))
+    story_data: StoryData = load_story_data(story_path=story_root)
 
     if not story_data.general:
         raise Exception("General story details do not exist, create a new story before generating the story structure.")
@@ -62,13 +61,7 @@ def generate_story_structure(
 
     story_data.structure = story_structure_data
 
-    with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-        yaml.dump(
-            story_data.model_dump(mode="json"),
-            f,
-            default_flow_style=False,
-            sort_keys=False,
-        )
+    save_story_data(story_root, story_data)
 
     utils.log_step(
         story_root=story_root,

@@ -1,14 +1,17 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
 import openai
-import yaml
 
-from config import prompts
 from config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer import response_schemas, utils
+from config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
 from story_writer.llm import validated_stream_llm
+from story_writer.response_schemas import story_general_schema
 from story_writer.story_data_model import GeneralData, StoryData
+from story_writer.utils import log_step, save_story_data
+
+log = logging.getLogger(__name__)
 
 
 def generate_general_story_details(client: openai.Client, user_prompt) -> Path | None:
@@ -20,14 +23,14 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     :param user_prompt: User's initial input to generate a story
     :return: Path to the directory containing the generated story data
     """
-
+    log.info("Generating Initial General Story Details (Title, Genres, Themes, and a Synopsis).")
     model = FIRST_PASS_GENERATION_MODEL
-    instructions = prompts.expand_user_input_prompt(user_prompt)
+    instructions = expand_user_input_prompt(user_prompt)
     messages = [
-        {"role": "system", "content": prompts.GENERAL_SYSTEM_PROMPT},
+        {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
-    response_format: dict = response_schemas.story_general_schema
+    response_format: dict = story_general_schema
 
     general_story_data, elapsed = validated_stream_llm(
         client=client,
@@ -41,15 +44,11 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     story_root = Path(f"{project_root}/stories/{general_story_data.title} - {datetime.now().timestamp() * 1000:.0f}")
     story_root.mkdir(parents=True, exist_ok=True)
 
-    with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-        yaml.dump(
-            StoryData(general=general_story_data).model_dump(mode="json"),
-            f,
-            default_flow_style=False,
-            sort_keys=False,
-        )
+    story_data = StoryData(general=general_story_data)  # Initial StoryData creation.
 
-    utils.log_step(
+    save_story_data(story_root, story_data)
+
+    log_step(
         story_root=story_root,
         messages=messages,
         file_name="expand_initial_prompt",

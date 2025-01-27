@@ -2,7 +2,7 @@ from os import system
 
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Header, Welcome, Label
+from textual.widgets import Button, Header, Label
 
 
 class MainPageApp(App[str]):

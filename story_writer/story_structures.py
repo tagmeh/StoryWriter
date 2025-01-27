@@ -1,10 +1,11 @@
+import logging
 from enum import Enum
-from typing import Type
 
 from pydantic import BaseModel
 
-from story_writer import response_schemas
-from story_writer import story_data_model
+from story_writer import response_schemas, story_data_model
+
+log = logging.getLogger(__name__)
 
 
 class StoryStructure(Enum):
@@ -71,14 +72,14 @@ structure_config = {
 
 def get_story_structure_schema(story_structure: StoryStructure) -> dict:
     try:
-        print(f"Story Structure: {story_structure.value}")
+        log.debug(f"Story Structure: {story_structure.value}")
         return structure_config[story_structure]["schema"]
-    except KeyError:
-        raise ValueError(f"Invalid story structure: {story_structure}")
+    except KeyError as err:
+        raise ValueError(f"Invalid story structure: {story_structure} - Error: {err}") from err
 
 
-def get_story_structure_model(story_structure: StoryStructure) -> Type[BaseModel]:
+def get_story_structure_model(story_structure: StoryStructure) -> type[BaseModel]:
     try:
         return structure_config[story_structure]["model"]
-    except KeyError:
-        raise ValueError(f"Invalid story structure: {story_structure}")
+    except KeyError as err:
+        raise ValueError(f"Invalid story structure: {story_structure} - Error: {err}") from err

@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Static, Placeholder
+from textual.widgets import Button, Placeholder, Static
 
 
 class Header(Placeholder):

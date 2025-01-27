@@ -9,14 +9,10 @@ story_general_schema = {
         "schema": {
             "type": "object",
             "properties": {
-                "title": {
-                    "type": "string",
-                },
+                "title": {"type": "string"},
                 "genres": {"type": "array", "items": {"type": "string"}},
                 "themes": {"type": "array", "items": {"type": "string"}},
-                "synopsis": {
-                    "type": "string",
-                },
+                "synopsis": {"type": "string"},
             },
             "required": ["title", "genres", "themes", "synopsis"],
         },
@@ -175,13 +171,9 @@ story_chapter_scene_schema = {
                         "type": "array",
                         "items": {"type": "string"},
                     },
+                    "misc": {"type": "str"},
                 },
-                "required": [
-                    "title",
-                    "characters",
-                    "location",
-                    "story_beats",
-                ],
+                "required": ["title", "characters", "location", "story_beats", "misc"],
             },
         },
         "required": ["output"],

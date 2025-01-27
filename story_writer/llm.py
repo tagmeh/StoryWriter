@@ -1,9 +1,9 @@
 import json
+import logging
 import re
 import time
 from json import JSONDecodeError
-from pprint import pprint
-from typing import TypeVar, Type, Union
+from typing import TypeVar
 
 import pydantic
 from pydantic import BaseModel
@@ -14,6 +14,8 @@ from config.story_settings import (
 )
 
 T = TypeVar("T", bound=BaseModel)
+
+log = logging.getLogger(__name__)
 
 
 def remove_directional_single_quotes(inp: str) -> str:
@@ -35,10 +37,10 @@ def validated_stream_llm(
     client,
     messages,
     model,
-    validation_model: Type[T],
+    validation_model: type[T],
     response_format: dict | None = None,
     max_retries: int = LLM_INVALID_OUTPUT_RETRY_COUNT,
-) -> (Union[Type[T], list[Type[T]]], float):
+) -> (type[T] | list[type[T]], float):
     start = time.time()
     max_retries = max_retries
     attempt = 0
@@ -56,16 +58,18 @@ def validated_stream_llm(
             elif isinstance(content, list):
                 valid_model = [validation_model(**item) for item in content]
             else:
-                raise Exception(f"{content} was neither a list or dict. int/str returns not yet supported.")
+                log.error(f"LLM Output: '{content}' is not supported.")
+                attempt += 1
+                continue
             attempt = 0
             break
 
         except pydantic.ValidationError as err:
-            print(f"GeneralData ValidationError: {err}")
+            log.error(f"GeneralData ValidationError: {err}")
             attempt += 1
 
     else:
-        print(f"Failed to get valid general story data in {max_retries} attempts.")
+        log.error(f"Failed to get valid general story data in {max_retries} attempts.")
         raise Exception(
             f"Failed to get valid general story data in {max_retries} attempts. "
             f"The model '{model}' may not be suitable for this task. "
@@ -85,9 +89,8 @@ def stream_llm(
     max_retries = max_retries
     retries = 0
     while retries < max_retries:
-
         for count, message in enumerate(messages):
-            print(f"{message['role']} - Message: {count}\n {message['content']}\n")
+            log.debug(f"Role: {message['role']} - Message: \n{message['content']}")
 
         response = client.chat.completions.create(
             messages=messages,
@@ -112,19 +115,21 @@ def stream_llm(
         output = output.strip()  # Reduces output that's all spaces and tabs into an empty string for validation.
 
         if response_format:  # Expectation is that the output will always be an object. Per structured output specs.
+            log.debug("LLM called with a response schema, output will be ran through a json serializer.")
             try:
                 content = json.loads(output)
             except JSONDecodeError as err:
-                print(f'JSON Error: "{err}" Retrying...')
+                log.error(f'JSONDecodeError: "{err}" Retrying...')
                 retries += 1
                 continue
 
         else:
+            log.debug("LLM called without a response schema, output is raw.")
             # Todo: Check to see if the openai package will return an integer if the LLM output is "1" or similar.
             content = output  # Without a response_format, output is expected to just be a string.
 
         if content == {} or content == [] or content == "":
-            print(f'No content returned from LLM. "{content}", Retrying...')
+            log.error(f'No content returned from LLM. "{content}", Retrying...')
             retries += 1
 
         else:
@@ -132,7 +137,7 @@ def stream_llm(
 
     # if retries >= max_retries:
     else:
-        print(f"Failed to get any data from the LLM in {retries} attempts.")
+        log.error(f"Failed to get any data from the LLM in {retries} attempts.")
 
 
 # def call_llm(client, messages, model, response_format):

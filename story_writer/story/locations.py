@@ -5,14 +5,14 @@
 #
 # from config.models import FIRST_PASS_GENERATION_MODEL
 # from story_writer.story_data_model import StoryData
-#
+# import logging
+
+# log = logging.getLogger(__name__)
 #
 # def expand_location(client: Client, story_dir: Path):
 #     model = FIRST_PASS_GENERATION_MODEL
 #
-#     # Load story-specific content.
-#     with open(story_dir / "overview.yaml", mode="r", encoding="utf-8") as f:
-#         story_overview = StoryData(**yaml.safe_load(f))
+#     story_data: StoryData = load_story_data(story_path=story_root)
 #
 #
 #     for chapter in story_chapters['chapters']:
@@ -115,8 +115,7 @@
 #             content = json.loads(content_str)
 #
 #
-#             with open(story_dir / "locations.yaml", mode="w+", encoding="utf-8") as f:
-#                 yaml.dump(story_data, f, default_flow_style=False, sort_keys=False)
+#             save_story_data(story_root, story_data)
 #
 #             utils.log_step(
 #                 story_root=story_dir, file_name="expand_locations", model=model,
