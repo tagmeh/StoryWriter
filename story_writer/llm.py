@@ -113,7 +113,7 @@ def stream_llm(
         print("")  # Prevents the next print statement from being on the same line as the last chunk.
         log.debug(f"Output: {len(output)=}")
 
-        log.debug('Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.')
+        log.debug("Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.")
         output = remove_directional_single_quotes(output)
         output = remove_end_of_line_indicators(output)
         output = replace_em_dash_with_regular_dash(output)
@@ -123,7 +123,7 @@ def stream_llm(
             log.debug("LLM called with a response schema, output will be ran through a json serializer.")
             try:
                 content = json.loads(output)
-                log.debug(f"Serialized LLM output successfully")
+                log.debug("Serialized LLM output successfully")
             except JSONDecodeError as err:
                 log.error(f'JSONDecodeError: "{err}". Attempts: {retries}, Retrying...')
                 retries += 1
