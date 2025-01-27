@@ -1,5 +1,6 @@
 from pprint import pprint
 
+from config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, CHAPTER_MINIMUM_COUNT
 from story_writer.story_data_model import StoryData, ChapterData
 from story_writer.story_structures import StoryStructure
 
@@ -93,7 +94,7 @@ def generate_story_chapters_prompt(story_data: StoryData) -> str:
     :param story_data:
     :return:
     """
-    instructions = f"""Define between 5 and 10 chapters.
+    instructions = f"""Define {CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
 Use the Title, Genres, Themes, story synopsis, and story structure to generate chapters.
 
 Define the chapter title.
@@ -119,7 +120,8 @@ Story Structure/Outline:\n
 
 
 def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
-    return f"""Define 5 or more scenes for this chapter. Scenes should expand on the chapter synopsis.
+    return f"""Define {SCENES_PER_CHAPTER_MINIMUM_COUNT + 1} or more scenes for this chapter. Scenes should expand 
+on the chapter synopsis.
 
 Define a short summary of the scene.
 Define the characters and their statuses in the scene.
