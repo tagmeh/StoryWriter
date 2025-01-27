@@ -164,15 +164,10 @@ story_chapter_scene_schema = {
                     "story_beats": {
                         "description": "A few sentences of what happens in this scene.",
                         "type": "array",
-                        "items": {"type": "string"}
+                        "items": {"type": "string"},
                     },
                 },
-                "required": [
-                    "summary",
-                    "characters",
-                    "location",
-                    "story_beats"
-                ],
+                "required": ["summary", "characters", "location", "story_beats"],
             },
         },
         "required": ["output"],
