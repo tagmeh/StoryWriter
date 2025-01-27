@@ -1,4 +1,4 @@
 /.idea/
 
-/stories/**
+/stories/**/
 /.ruff_cache/
