@@ -90,7 +90,7 @@ def stream_llm(
     retries = 0
     while retries < max_retries:
         for count, message in enumerate(messages):
-            log.debug(f"Role: {message['role']} - Message: \n{message['content']}")
+            log.debug(f"Message: {count} - Role: {message['role']} - Content: \n{message['content']}")
 
         response = client.chat.completions.create(
             messages=messages,
