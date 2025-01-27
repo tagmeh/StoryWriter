@@ -39,3 +39,7 @@ ruff = "*"
 
 [requires]
 python_version = "3.10"
+
+[scripts]
+# pipenv requirements > requirements.txt
+# pipenv requirements --dev > dev-requirements.txt
