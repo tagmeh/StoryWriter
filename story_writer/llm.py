@@ -88,10 +88,14 @@ def stream_llm(
 ):
     max_retries = max_retries
     retries = 0
-    while retries < max_retries:
-        for count, message in enumerate(messages):
-            log.debug(f"Message: {count} - Role: {message['role']} - Content: \n{message['content']}")
 
+    # Output the message contents for use in testing manually.
+    for count, message in enumerate(messages):
+        log.debug(f"Message: {count} - Role: {message['role']} - Content: \n{message['content']}")
+
+    log.debug(f"Structured Output Object: \n{json.dumps(response_format)}")
+
+    while retries < max_retries:
         response = client.chat.completions.create(
             messages=messages,
             model=model,
@@ -107,8 +111,9 @@ def stream_llm(
                 print(chunk.choices[0].delta.content or "", end="")
                 output += chunk.choices[0].delta.content or ""
         print("")  # Prevents the next print statement from being on the same line as the last chunk.
+        log.debug(f"Output: {len(output)=}")
 
-        # String cleanup, pre-json.loads()
+        log.debug('Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.')
         output = remove_directional_single_quotes(output)
         output = remove_end_of_line_indicators(output)
         output = replace_em_dash_with_regular_dash(output)
@@ -118,24 +123,24 @@ def stream_llm(
             log.debug("LLM called with a response schema, output will be ran through a json serializer.")
             try:
                 content = json.loads(output)
+                log.debug(f"Serialized LLM output successfully")
             except JSONDecodeError as err:
-                log.error(f'JSONDecodeError: "{err}" Retrying...')
+                log.error(f'JSONDecodeError: "{err}". Attempts: {retries}, Retrying...')
                 retries += 1
                 continue
 
-        else:
+        else:  # Output is a string because there was no structured output/response format.
             log.debug("LLM called without a response schema, output is raw.")
             # Todo: Check to see if the openai package will return an integer if the LLM output is "1" or similar.
             content = output  # Without a response_format, output is expected to just be a string.
 
         if content == {} or content == [] or content == "":
-            log.error(f'No content returned from LLM. "{content}", Retrying...')
+            log.error(f'No content returned from LLM. "{content}". Attempts: {retries}, Retrying...')
             retries += 1
 
         else:
             return content
 
-    # if retries >= max_retries:
     else:
         log.error(f"Failed to get any data from the LLM in {retries} attempts.")
 
