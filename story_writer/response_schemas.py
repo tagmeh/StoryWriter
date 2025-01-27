@@ -108,13 +108,8 @@ story_chapters_schema = {
                         "items": {
                             "type": "object",
                             "properties": {
-                                "name": {
-                                    "type": "string",
-                                },
-                                "status": {
-                                    "description": "Alive, dead, missing, transformed, dazed, asleep, etc",
-                                    "type": "string",
-                                },
+                                "name": {"type": "string"},
+                                "status": {"type": "string"},
                             },
                             "required": ["name", "status"],
                         },
@@ -169,11 +164,15 @@ story_chapter_scene_schema = {
                     "story_beats": {
                         "description": "A few sentences of what happens in this scene.",
                         "type": "array",
-                        "items": {"type": "string"},
+                        "items": {"type": "string"}
                     },
-                    "misc": {"type": "str"},
                 },
-                "required": ["title", "characters", "location", "story_beats", "misc"],
+                "required": [
+                    "summary",
+                    "characters",
+                    "location",
+                    "story_beats"
+                ],
             },
         },
         "required": ["output"],
