@@ -1,19 +1,18 @@
 from pathlib import Path
 
-import yaml
 from openai import Client
 
 from config.models import FIRST_PASS_GENERATION_MODEL
-from config.prompts import generate_story_chapters_prompt, GENERAL_SYSTEM_PROMPT
+from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapters_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_chapters_schema
-from story_writer.story_data_model import StoryData, ChapterData
+from story_writer.story_data_model import ChapterData, StoryData
+from story_writer.utils import load_story_data, save_story_data
 
 
 def generate_chapters(client: Client, story_root: Path):
-    with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-        story_data = StoryData(**yaml.safe_load(f))
+    story_data: StoryData = load_story_data(story_path=story_root)
 
     character_seed_str = ""
     for char_dict in [char.dict() for char in story_data.characters]:
@@ -43,13 +42,7 @@ def generate_chapters(client: Client, story_root: Path):
 
     story_data.chapters = content
 
-    with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-        yaml.dump(
-            story_data.model_dump(mode="json"),
-            f,
-            default_flow_style=False,
-            sort_keys=False,
-        )
+    save_story_data(story_root, story_data)
 
     utils.log_step(
         story_root=story_root,

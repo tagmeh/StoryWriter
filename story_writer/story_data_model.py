@@ -1,7 +1,7 @@
 import re
-from typing import Any, TypeVar, Type, Generic, Annotated, Union
+from typing import Annotated, Any, Generic, TypeVar
 
-from pydantic import BaseModel, field_validator, AfterValidator
+from pydantic import AfterValidator, BaseModel, field_validator
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -9,7 +9,7 @@ T = TypeVar("T", bound=BaseModel)
 class DeferredModel(Generic[T]):
     """https://github.com/pydantic/pydantic/issues/559#issuecomment-519686409"""
 
-    def __init__(self, type_: Type[T], kwargs: dict[str, Any]):
+    def __init__(self, type_: type[T], kwargs: dict[str, Any]):
         self.type_ = type_
         self.kwargs = kwargs
 
@@ -22,7 +22,7 @@ class DeferredModel(Generic[T]):
 
 class DeferrableModel(BaseModel):
     @classmethod
-    def defer(cls: Type[T], **kwargs: Any) -> DeferredModel[T]:
+    def defer(cls: type[T], **kwargs: Any) -> DeferredModel[T]:
         return DeferredModel(cls, kwargs)
 
 
@@ -208,19 +208,19 @@ class GeneralData(BaseModel):
 
 class StoryStructureData(BaseModel):
     style: str  # e.g. "Three-Act Structure"
-    structure: Union[
-        ClassicStoryStructure,
-        ThreeActStructure,
-        FiveActStructure,
-        SevenPointStoryStructure,
-        FreytagsPyramidStoryStructure,
-        TheHerosJourneyStoryStructure,
-        DanHarmonsStoryCircleStructure,
-        StorySpine,
-        FichteanCurveStructure,
-        InMediasRes,
-        SaveTheCatStructure,
-    ]
+    structure: (
+        ClassicStoryStructure
+        | ThreeActStructure
+        | FiveActStructure
+        | SevenPointStoryStructure
+        | FreytagsPyramidStoryStructure
+        | TheHerosJourneyStoryStructure
+        | DanHarmonsStoryCircleStructure
+        | StorySpine
+        | FichteanCurveStructure
+        | InMediasRes
+        | SaveTheCatStructure
+    )
 
 
 class CharacterData(BaseModel):
@@ -241,6 +241,7 @@ class SceneData(BaseModel):
     number: int | None = None  # This is added manually. LLMs don't always count in order.
     characters: list[ChapterCharacterData]
     location: Annotated[str, AfterValidator(str_not_empty)]
+    misc: str | None = None
     story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
 
 

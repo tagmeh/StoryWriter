@@ -1,7 +1,5 @@
-from pprint import pprint
-
-from config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, CHAPTER_MINIMUM_COUNT
-from story_writer.story_data_model import StoryData, ChapterData
+from config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
+from story_writer.story_data_model import ChapterData, StoryData
 from story_writer.story_structures import StoryStructure
 
 GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character defining details to fill out the story."
@@ -126,12 +124,11 @@ on the chapter synopsis.
 Define a short summary of the scene.
 Define the characters and their statuses in the scene.
 Define the location the scene takes place in.
-Define 2-5 story beats for this scene.
+Define a few story beats for this scene.
 
 Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 
-Chapter Number: {chapter.number}
 Chapter Title: {chapter.title}
 Story Structure reference: {chapter.story_structure_point}
 Relevant Characters: {", ".join([f"{char.name}: {char.status}" for char in [char for char in chapter.characters]])}

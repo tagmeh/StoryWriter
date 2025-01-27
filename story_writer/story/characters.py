@@ -1,6 +1,6 @@
+import logging
 from pathlib import Path
 
-import yaml
 from openai import Client
 
 from config.models import FIRST_PASS_GENERATION_MODEL
@@ -8,12 +8,17 @@ from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_characters_prom
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_characters_schema
-from story_writer.story_data_model import StoryData, CharacterData
+from story_writer.story_data_model import CharacterData, StoryData
+from story_writer.utils import load_story_data, save_story_data
+
+log = logging.getLogger(__name__)
 
 
 def generate_characters(client: Client, story_root: Path):
-    with open(story_root / "story_data.yaml", mode="r", encoding="utf-8") as f:
-        story_data = StoryData(**yaml.safe_load(f))
+
+    story_data: StoryData = load_story_data(story_path=story_root)
+
+    log.info(f"Generating Characters for story: '{story_data.general.title}'")
 
     model = FIRST_PASS_GENERATION_MODEL
     instructions = generate_story_characters_prompt(story_data=story_data)
@@ -34,13 +39,7 @@ def generate_characters(client: Client, story_root: Path):
 
     story_data.characters = content
 
-    with open(story_root / "story_data.yaml", mode="w+", encoding="utf-8") as f:
-        yaml.dump(
-            story_data.model_dump(mode="json"),
-            f,
-            default_flow_style=False,
-            sort_keys=False,
-        )
+    save_story_data(story_root, story_data)
 
     utils.log_step(
         story_root=story_root,
