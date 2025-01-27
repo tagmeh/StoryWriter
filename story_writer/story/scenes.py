@@ -90,3 +90,4 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             response_format=response_format,
             duration=elapsed,
         )
+    log.info(f"Scenes generated for all chapters. Story outline is complete.")
