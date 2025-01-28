@@ -1,6 +1,6 @@
 # Story Step Response Schemas
 
-# Describes a response with a "title", "genres", "themes", and "synopsis" for a story.
+# Describes a response with a "title", "genres", "themes", and "synopsis" for a outline.
 story_general_schema = {
     "type": "json_schema",
     "json_schema": {
@@ -20,19 +20,51 @@ story_general_schema = {
     },
 }
 
-# Describes a response that matches the given story structure schema.
+# Describes a response that matches the given outline structure schema.
 story_structure_schema = {
     "type": "json_schema",
     "json_schema": {
         "name": "output",
         "strict": "true",
-        "schema": None,  # This is overwritten by the specific story structure schema.
+        "schema": None,  # This is overwritten by the specific outline structure schema.
+        "required": ["output"],
+    },
+}
+
+# Describes a response for the worldbuilding query.
+story_worldbuilding_schema = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "output",
+        "strict": "true",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "geography": {"type": "string"},
+                "culture": {"type": "string"},
+                "history": {"type": "string"},
+                "politics": {"type": "string"},
+                "economy": {"type": "string"},
+                "magic_technology": {"type": "string"},
+                "religion": {"type": "string"},
+                "additional_details": {"type": "string"}
+            },
+            "required": [
+                "geography",
+                "culture",
+                "history",
+                "politics",
+                "economy",
+                "magic_technology",
+                "religion"
+            ],
+        },
         "required": ["output"],
     },
 }
 
 # Describes a response with an array of characters, each with
-#  a "name", "age", "reason in story", "description", and "personality".
+#  a "name", "age", "reason in outline", "description", and "personality".
 story_characters_schema = {
     "type": "json_schema",
     "json_schema": {
@@ -86,7 +118,7 @@ story_locations_schema = {
 }
 
 # Describes a response with an array of chapters, each with
-#  a "title", "chapter number", "story structure point", "location", "characters", and "synopsis".
+#  a "title", "chapter number", "outline structure point", "location", "characters", and "synopsis".
 story_chapters_schema = {
     "type": "json_schema",
     "json_schema": {
@@ -99,7 +131,7 @@ story_chapters_schema = {
                 "properties": {
                     "title": {"type": "string"},
                     "story_structure_point": {
-                        "description": "The relevant story structure point for this chapter.",
+                        "description": "The relevant outline structure point for this chapter.",
                         "type": "string",
                     },
                     "location": {"type": "string"},
@@ -130,7 +162,7 @@ story_chapters_schema = {
 }
 
 # Describes a response with an array of scenes for a chapter, each with
-#  a "scene number", "characters", "location", and "story beats".
+#  a "scene number", "characters", "location", and "outline beats".
 #  (Associated chapter number is attached after generation)
 story_chapter_scene_schema = {
     "type": "json_schema",
@@ -177,7 +209,7 @@ story_chapter_scene_schema = {
 # Story Structure Response Schemas
 classic = {
     "type": "object",
-    "description": "A generic story structure for all types of stories.",
+    "description": "A generic outline structure for all types of stories.",
     "properties": {
         "exposition": {"type": "string"},
         "rising_action": {"type": "string"},
@@ -196,14 +228,14 @@ classic = {
 
 three_act_structure = {
     "type": "object",
-    "description": "Traditional story structure, most structures follow a variation on this one. Very popular in movies",
+    "description": "Traditional outline structure, most structures follow a variation on this one. Very popular in movies",
     "properties": {
         "act_1_exposition": {
             "description": "Establish the status quo.",
             "type": "string",
         },
         "act_1_inciting_incident": {
-            "description": "Event that starts the story.",
+            "description": "Event that starts the outline.",
             "type": "string",
         },
         "act_1_plot_point_1": {
@@ -261,7 +293,7 @@ five_act_structure = {
             "type": "string",
         },
         "climax": {
-            "description": "Center of the story, the point of no return.",
+            "description": "Center of the outline, the point of no return.",
             "type": "string",
         },
         "falling_action": {
@@ -306,7 +338,7 @@ seven_point_story_structure = {
 
 freytags_pyramid = {
     "type": "object",
-    "description": "A story structure for tragic narratives.",
+    "description": "A outline structure for tragic narratives.",
     "properties": {
         "exposition": {
             "description": "Establish the status quo. Ends with the inciting incident.",
@@ -317,7 +349,7 @@ freytags_pyramid = {
             "type": "string",
         },
         "climax": {
-            "description": "Center of the story, the point of no return.",
+            "description": "Center of the outline, the point of no return.",
             "type": "string",
         },
         "falling_action": {
@@ -417,7 +449,7 @@ dan_harmons_story_circle = {
         "search": {"description": "", "type": "string"},
         "find": {"description": "", "type": "string"},
         "take": {"description": "", "type": "string"},
-        "return": {"description": "", "type": "string"},
+        "returns": {"description": "", "type": "string"},
         "change": {"description": "", "type": "string"},
     },
     "required": ["you", "need", "go", "search", "find", "take", "_return", "change"],
@@ -447,7 +479,7 @@ story_spine = {
             "description": "The pursuit of their goals have consequences. A goal may have been achieved, but it leads to something else.",
             "type": "string",
         },
-        "until_finally": {"description": "Climax of the story.", "type": "string"},
+        "until_finally": {"description": "Climax of the outline.", "type": "string"},
         "and_ever_since_that_day": {
             "description": "How did the hero change from the journey. What did they bring back with them.",
             "type": "string",
@@ -489,7 +521,7 @@ fichtean_curve = {
 
 in_medias_res = {
     "type": "object",
-    "description": "Framework for starting the story in the middle of the action.",
+    "description": "Framework for starting the outline in the middle of the action.",
     "properties": {
         "in_medias_res": {
             "description": "Starts off immediately in the action with little to no exposition or backstory.",
@@ -531,7 +563,7 @@ save_the_cat = {
     "description": "A more detailed version of the three act structure.",
     "properties": {
         "opening_image": {
-            "description": "Story starts out with a brief look at the protagonist, gets the feel and tone of the story.",
+            "description": "Story starts out with a brief look at the protagonist, gets the feel and tone of the outline.",
             "type": "string",
         },
         "set_up": {
@@ -539,7 +571,7 @@ save_the_cat = {
             "type": "string",
         },
         "theme_stated": {
-            "description": "Make clear what the theme is. The theme may becomes more obvious to the progatonist as the story progresses.",
+            "description": "Make clear what the theme is. The theme may becomes more obvious to the progatonist as the outline progresses.",
             "type": "string",
         },
         "catalyst": {
@@ -555,7 +587,7 @@ save_the_cat = {
             "type": "string",
         },
         "b_story": {
-            "description": "Introduced to the b plot of the story.",
+            "description": "Introduced to the b plot of the outline.",
             "type": "string",
         },
         "fun_and_games": {
@@ -587,7 +619,7 @@ save_the_cat = {
             "type": "string",
         },
         "final_image": {
-            "description": "The final snapshot of the story, it should mirror the opening image.",
+            "description": "The final snapshot of the outline, it should mirror the opening image.",
             "type": "string",
         },
     },

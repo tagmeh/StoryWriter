@@ -1,23 +1,19 @@
 from openai import OpenAI
 
-from config.story_settings import STORY_STRUCTURE_STYLE
-from story_writer.story.chapters import generate_chapters
-from story_writer.story.characters import generate_characters
-from story_writer.story.outline import generate_general_story_details
-from story_writer.story.scenes import generate_scenes_for_chapter
-from story_writer.story.structure import generate_story_structure
+from story_writer.scripts.generate_story_outline import generate_story_outline
+
 
 if __name__ == "__main__":
+    # Local urls may be "127.0.0.1" or "localhost"
+    # LM Studio: http://url:1234/v1
+    # Ollama:    http://url:11434/v1
+    # Jan        http://url:1337/v1  < Doesn't support structured output as of 2025/01/27 (or so it seems)
     client = OpenAI(base_url="http://127.0.0.1:1234/v1", api_key="lm studio")
 
     with open("stories/prompt.txt", mode='r', encoding='utf-8') as f:
         prompt = f.read()
 
-    # current_story = "Kilometer Kicker - One-Clawed Triumph - 20250125201724"
-    # story_path = story_root = Path(f"stories/{current_story}")
+    generate_story_outline(client, prompt.strip())
 
-    story_root = generate_general_story_details(client, prompt.strip())
-    generate_story_structure(client, story_root, story_structure=STORY_STRUCTURE_STYLE)
-    generate_characters(client, story_root)
-    generate_chapters(client, story_root)
-    generate_scenes_for_chapter(client, story_root)
+
+

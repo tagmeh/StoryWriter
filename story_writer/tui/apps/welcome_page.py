@@ -34,7 +34,7 @@ class MainPageApp(App[str]):
         yield Header(id="Header")
         yield Static("StoryWriter", id="title")
         yield Static(
-            "Create or Modify a story using a large language model, local or remote",
+            "Create or Modify an outline using a large language model, local or remote",
             id="subtitle",
         )
         yield Button("Create New Story", id="create", variant="success")

@@ -21,7 +21,7 @@ def log_step(
     duration: float,
 ):
     """
-    Generates logs per-story in order to inspect the inputs and outputs of the LLM calls, per function.
+    Generates logs per-outline in order to inspect the inputs and outputs of the LLM calls, per function.
 
     :param messages:
     :param story_root:
@@ -50,7 +50,7 @@ def log_step(
 
 def load_story_data(story_path: Path):
     story_data_path = story_path / "story_data.yaml"
-    log.debug(f"Loading story data from '{story_data_path}'")
+    log.debug(f"Loading outline data from '{story_data_path}'")
     with open(story_data_path, encoding="utf-8") as f:
         return StoryData(**yaml.safe_load(f))
 
@@ -59,15 +59,15 @@ def save_story_data(story_path: Path, story_data: StoryData) -> None:
     """
     Saves the current state of the StoryData instance. This is used as a cache/save point while gathering data.
 
-    :param story_path: Path - Path to the root /stories/ directory where the story output is stored.
-    :param story_data: StoryData - Pydantic model representation of the cached/saved story data.
+    :param story_path: Path - Path to the root /stories/ directory where the outline output is stored.
+    :param story_data: StoryData - Pydantic model representation of the cached/saved outline data.
     :return: None
     """
     story_data_path = story_path / "story_data.yaml"
-    log.debug(f'Saving/Updating story data to {story_path / "story_data.yaml"}')
+    log.debug(f'Saving/Updating outline data to {story_path / "story_data.yaml"}')
 
     # TODO: May update this section to allow for json or yaml outputs dictated by user setting.
     with open(story_data_path, mode="w+", encoding="utf-8") as f:
         yaml.dump(story_data.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
 
-    log.debug(f"Saved/Updated story data for story: '{story_data.general.title}'")
+    log.debug(f"Saved/Updated outline data for story: '{story_data.general.title}'")
