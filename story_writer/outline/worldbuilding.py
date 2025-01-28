@@ -7,7 +7,6 @@ from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, generate_worldbuilding_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_worldbuilding_schema
 from story_writer.story_data_model import StoryData, WorldbuildingData
 from story_writer.utils import load_story_data, save_story_data
 
@@ -26,7 +25,6 @@ def generate_worldbuilding(client: Client, story_root: Path):
         {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
-    response_format: dict = story_worldbuilding_schema
 
     # Todo: Potentially add a "Have enough characters" validator, if not, rerun validated_stream_llm
     content, elapsed = validated_stream_llm(
@@ -47,6 +45,6 @@ def generate_worldbuilding(client: Client, story_root: Path):
         file_name="generate_worldbuilding",
         model=model,
         settings={},
-        response_format=response_format,
+        response_model=response_format,
         duration=elapsed,
     )

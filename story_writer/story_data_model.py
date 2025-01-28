@@ -2,9 +2,10 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Annotated, Any, Generic, Literal, TypeVar
+from typing import Annotated, Any, Literal, TypeVar, Type
 
-from pydantic import AfterValidator, BaseModel, field_validator
+import yaml
+from pydantic import AfterValidator, BaseModel, field_validator, Field
 
 log = logging.getLogger(__name__)
 
@@ -12,34 +13,22 @@ T = TypeVar("T", bound=BaseModel)
 CBM = TypeVar("CBM", bound="CustomBaseModel")
 
 
-# Todo: Determine if using this neat DeferredModel is needed for the StoryData model.
-#  Problem: We wanted to validate the StoryData object, but for most of it's outline-generating
-#  life, it was missing information. So it could only be validated once the outline is complete.
-#  The DeferredModel object is a "DeferredModel" type until validated, in which case it becomes
-#  a StoryData (or w/e normal type).
-#  If we can wait until the outline is done to validate the StoryData, then why do we need this DeferredModel model?
-class DeferredModel(Generic[T]):
-    """https://github.com/pydantic/pydantic/issues/559#issuecomment-519686409"""
-
-    def __init__(self, type_: type[T], kwargs: dict[str, Any]):
-        self.type_ = type_
-        self.kwargs = kwargs
-
-    def validate(self) -> T:
-        return self.type_(**self.kwargs)
-
-    def __repr__(self):
-        return f"{type(self).__name__}(type_={self.type_.__name__}, kwargs={self.kwargs})"
-
-
-class DeferrableModel(BaseModel):
-    @classmethod
-    def defer(cls: type[T], **kwargs: Any) -> DeferredModel[T]:
-        return DeferredModel(cls, kwargs)
+def create_json_schema(model: Type[BaseModel]) -> dict[str, Any] | None:
+    schema = model.model_json_schema()
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": model.__name__,
+            "strict": True,
+            "schema": schema,
+            "required": [model.__name__]
+        }
+    } if schema else None
 
 
 def str_not_empty(value: str) -> str:
     """Prevents empty strings from being a valid input when requiring a string input."""
+    value = value.strip()
     if value == "":
         raise ValueError(f"'{value}' must not be empty.")
     return value
@@ -79,9 +68,9 @@ class CustomBaseModel(BaseModel):
                     json.dump(self.model_dump(mode="json"), f, indent=4)
             elif file_type == "yaml":
                 with open(file_path, mode="w+", encoding="utf-8") as f:
-                    yaml.dump(story_data.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
-        except Exception:
-            log.error(f"Unable to save file '{file_path}'")
+                    yaml.dump(self.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
+        except Exception as err:
+            log.error(f"Unable to save file '{file_path}' due to error: {err}")
             raise
 
     @classmethod
@@ -99,16 +88,11 @@ class CustomBaseModel(BaseModel):
 
 
 class StoryStructure(CustomBaseModel):
-    """
-    Parent to all the outline structure types.
-    """
-
-    # Todo: Identify a way to generate a list of types of the classes that subclass StoryStructure to
-    #  dynamically update the StoryStructureData.structure property. If possible.++
-    ...
+    style: str  # Name of the story structure style/format
 
 
 class ClassicStoryStructure(StoryStructure):
+    style: str = "Classic Story Structure"
     exposition: Annotated[str, AfterValidator(str_not_empty)]
     rising_action: Annotated[str, AfterValidator(str_not_empty)]
     climax: Annotated[str, AfterValidator(str_not_empty)]
@@ -117,26 +101,29 @@ class ClassicStoryStructure(StoryStructure):
 
 
 class ThreeActStructure(StoryStructure):
-    act_1_exposition: str
-    act_1_inciting_incident: str
-    act_1_plot_point_1: str
-    act_2_rising_action: str
-    act_2_midpoint: str
-    act_2_plot_point_2: str
-    act_3_pre_climax: str
-    act_3_climax: str
-    act_3_denouement: str
+    style: str = "Three Act Structure"
+    act_1_exposition: Annotated[str, AfterValidator(str_not_empty)]
+    act_1_inciting_incident: Annotated[str, AfterValidator(str_not_empty)]
+    act_1_plot_point_1: Annotated[str, AfterValidator(str_not_empty)]
+    act_2_rising_action: Annotated[str, AfterValidator(str_not_empty)]
+    act_2_midpoint: Annotated[str, AfterValidator(str_not_empty)]
+    act_2_plot_point_2: Annotated[str, AfterValidator(str_not_empty)]
+    act_3_pre_climax: Annotated[str, AfterValidator(str_not_empty)]
+    act_3_climax: Annotated[str, AfterValidator(str_not_empty)]
+    act_3_denouement: Annotated[str, AfterValidator(str_not_empty)]
 
 
 class FiveActStructure(StoryStructure):
-    exposition: str
-    rising_action: str
-    climax: str
-    falling_action: str
-    resolution: str
+    style: str = "Five Act Structure"
+    exposition: Annotated[str, AfterValidator(str_not_empty)]
+    rising_action: Annotated[str, AfterValidator(str_not_empty)]
+    climax: Annotated[str, AfterValidator(str_not_empty)]
+    falling_action: Annotated[str, AfterValidator(str_not_empty)]
+    resolution: Annotated[str, AfterValidator(str_not_empty)]
 
 
 class SevenPointStoryStructure(StoryStructure):
+    style: str = "Seven Point Story Structure"
     hook: Annotated[str, AfterValidator(str_not_empty)]
     plot_turn_1: Annotated[str, AfterValidator(str_not_empty)]
     pinch_point_1: Annotated[str, AfterValidator(str_not_empty)]
@@ -147,6 +134,7 @@ class SevenPointStoryStructure(StoryStructure):
 
 
 class FreytagsPyramidStoryStructure(StoryStructure):
+    style: str = "Freytag's Pyramid"
     exposition: Annotated[str, AfterValidator(str_not_empty)]
     rising_action: Annotated[str, AfterValidator(str_not_empty)]
     climax: Annotated[str, AfterValidator(str_not_empty)]
@@ -155,6 +143,7 @@ class FreytagsPyramidStoryStructure(StoryStructure):
 
 
 class TheHerosJourneyStoryStructure(StoryStructure):
+    style: str = "The Hero's Journey"
     the_ordinary_world: Annotated[str, AfterValidator(str_not_empty)]
     the_call_to_adventure: Annotated[str, AfterValidator(str_not_empty)]
     the_refusal_of_the_call: Annotated[str, AfterValidator(str_not_empty)]
@@ -170,6 +159,7 @@ class TheHerosJourneyStoryStructure(StoryStructure):
 
 
 class DanHarmonsStoryCircleStructure(StoryStructure):
+    style: str = "Dan Harmon's Story Circle"
     you: Annotated[str, AfterValidator(str_not_empty)]
     need: Annotated[str, AfterValidator(str_not_empty)]
     go: Annotated[str, AfterValidator(str_not_empty)]
@@ -181,6 +171,7 @@ class DanHarmonsStoryCircleStructure(StoryStructure):
 
 
 class StorySpine(StoryStructure):
+    style: str = "Story Spine"
     once_upon_a_time: Annotated[str, AfterValidator(str_not_empty)]
     and_every_day: Annotated[str, AfterValidator(str_not_empty)]
     until_one_day: Annotated[str, AfterValidator(str_not_empty)]
@@ -191,6 +182,7 @@ class StorySpine(StoryStructure):
 
 
 class FichteanCurveStructure(StoryStructure):
+    style: str = "Fichtean Curve"
     inciting_incident: Annotated[str, AfterValidator(str_not_empty)]
     first_crisis: Annotated[str, AfterValidator(str_not_empty)]
     second_crisis: Annotated[str, AfterValidator(str_not_empty)]
@@ -201,6 +193,7 @@ class FichteanCurveStructure(StoryStructure):
 
 
 class InMediasRes(StoryStructure):
+    style: str = "In Medias Res"
     in_medias_res: Annotated[str, AfterValidator(str_not_empty)]
     rising_action: Annotated[str, AfterValidator(str_not_empty)]
     explanation: Annotated[str, AfterValidator(str_not_empty)]
@@ -210,6 +203,7 @@ class InMediasRes(StoryStructure):
 
 
 class SaveTheCatStructure(StoryStructure):
+    style: str = "Save the Cat"
     opening_image: Annotated[str, AfterValidator(str_not_empty)]
     set_up: Annotated[str, AfterValidator(str_not_empty)]
     theme_stated: Annotated[str, AfterValidator(str_not_empty)]
@@ -236,7 +230,7 @@ class GeneralData(CustomBaseModel):
     This model must match the json schema of the LLM's response_format input.
     """
 
-    title: Annotated[str, AfterValidator(str_not_empty)]
+    title: Annotated[str, AfterValidator(str_not_empty), Field(description="The title of the story.")]
     themes: list[Annotated[str, AfterValidator(str_not_empty)]]
     genres: list[Annotated[str, AfterValidator(str_not_empty)]]
     synopsis: Annotated[str, AfterValidator(str_not_empty)]
@@ -252,14 +246,14 @@ class GeneralData(CustomBaseModel):
 
     @field_validator("themes", "genres")
     @classmethod
-    def clean_arrays(cls, value):
+    def clean_array(cls, value):
         """
         Account for some of the weird ways the LLM outputs sometimes.
 
         Examples: ["Self-discovery | Friendship | Redemption"]
         """
         for item in value:
-            if "|" in item:
+            if "|" in item:  # Sometimes the LLM separates strings with a pipe. /shrug
                 sub_values = item.split("|")
                 value.remove(item)
                 value.extend(sub_values)
@@ -269,23 +263,6 @@ class GeneralData(CustomBaseModel):
             item.strip()
 
         return value
-
-
-class StructureData(CustomBaseModel):
-    style: str  # e.g. "Three-Act Structure"
-    structure: (
-        ClassicStoryStructure
-        | ThreeActStructure
-        | FiveActStructure
-        | SevenPointStoryStructure
-        | FreytagsPyramidStoryStructure
-        | TheHerosJourneyStoryStructure
-        | DanHarmonsStoryCircleStructure
-        | StorySpine
-        | FichteanCurveStructure
-        | InMediasRes
-        | SaveTheCatStructure
-    )
 
 
 class WorldbuildingData(CustomBaseModel):
@@ -387,7 +364,20 @@ class ChapterData(CustomBaseModel):
 
 class StoryData(CustomBaseModel):
     general: GeneralData | None = None
-    structure: StructureData | None = None
+    structure: (
+            ClassicStoryStructure
+            | ThreeActStructure
+            | FiveActStructure
+            | SevenPointStoryStructure
+            | FreytagsPyramidStoryStructure
+            | TheHerosJourneyStoryStructure
+            | DanHarmonsStoryCircleStructure
+            | StorySpine
+            | FichteanCurveStructure
+            | InMediasRes
+            | SaveTheCatStructure
+            | None
+    ) = None
     worldbuilding: WorldbuildingData | None = None
     characters: list[CharacterData] | None = None
     chapters: list[ChapterData] | None = None
@@ -449,7 +439,7 @@ class StoryData(CustomBaseModel):
     #  2) Save a settings.json or similar for each story, then reference that to determine style of saving, file_type, ect.
     @classmethod
     def load_from_file(
-        cls: type[CBM], saved_dir: Path, file_type: Literal["json", "yaml"], one_file: bool = True
+            cls: type[CBM], saved_dir: Path, file_type: Literal["json", "yaml"], one_file: bool = True
     ) -> "StoryData":
         if one_file:
             story_data_path = saved_dir / f"story_data.{file_type}"
@@ -491,12 +481,3 @@ class StoryData(CustomBaseModel):
                 story_data["chapters"] = chapters
 
             return cls(**story_data)
-
-
-if __name__ == "__main__":
-    import yaml
-
-    with open("../stories/Radioactive Whiskers - 1738030968435/story_data.yaml", encoding="utf-8") as f:
-        story_data = StoryData(**yaml.safe_load(f))
-
-    print(story_data)

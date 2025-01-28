@@ -1,20 +1,22 @@
 from enum import Enum
 
-
-class StoryStructure(Enum):
-    CLASSIC = "Classic"
-    THREE_ACT_STRUCTURE = "Three Act Story Structure"
-    FIVE_ACT_STRUCTURE = "Five Act Story Structure"
-    SEVEN_POINT = "Seven Point Story Structure"
-    FREYTAGS_PYRAMID = "Freytag's Pyramid"
-    THE_HEROS_JOURNEY = "The Hero's Journey"
-    DAN_HARMONS_STORY_CIRCLE = "Dan Harmon's Story Circle"
-    STORY_SPINE = "Story Spine"
-    FICHTEAN_CURVE = "Fichtean Curve"
-    IN_MEDIAS_RES = "In Medias Res"
-    SAVE_THE_CAT = "Save the Cat Beat Sheet"
+from story_writer import story_data_model as model
 
 
-class StorySaveFormat(Enum):
+class StoryStructureEnum(Enum):
+    CLASSIC = model.ClassicStoryStructure
+    THREE_ACT_STRUCTURE = model.ThreeActStructure
+    FIVE_ACT_STRUCTURE = model.FiveActStructure
+    SEVEN_POINT = model.SevenPointStoryStructure
+    FREYTAGS_PYRAMID = model.FreytagsPyramidStoryStructure
+    THE_HEROS_JOURNEY = model.TheHerosJourneyStoryStructure
+    DAN_HARMONS_STORY_CIRCLE = model.DanHarmonsStoryCircleStructure
+    STORY_SPINE = model.StorySpine
+    FICHTEAN_CURVE = model.FichteanCurveStructure
+    IN_MEDIAS_RES = model.InMediasRes
+    SAVE_THE_CAT = model.SaveTheCatStructure
+
+
+class StorySaveFormatEnum(Enum):
     JSON = "json"
     YAML = "yaml"

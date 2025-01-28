@@ -1,8 +1,8 @@
-from story_writer.constants import StorySaveFormat, StoryStructure
+from story_writer.constants import StorySaveFormatEnum, StoryStructureEnum
 
 # STORY SETTINGS ======================================================================
 # The type of outline/structure generated to help keep the outline on track.
-STORY_STRUCTURE_STYLE: StoryStructure = StoryStructure.SEVEN_POINT
+STORY_STRUCTURE_STYLE: StoryStructureEnum = StoryStructureEnum.SEVEN_POINT
 
 # Minimum required chapters for the outline.
 CHAPTER_MINIMUM_COUNT = 5
@@ -12,7 +12,7 @@ SCENES_PER_CHAPTER_MINIMUM_COUNT = 3
 
 # SYSTEM SETTINGS =====================================================================
 # File format that the story_data (or the separate files) are saved as.
-SAVE_STORY_FILE_TYPE = StorySaveFormat.JSON  # JSON or YAML
+SAVE_STORY_FILE_TYPE = StorySaveFormatEnum.JSON  # JSON or YAML
 
 # If False, will save each of the different sections of the story_data as their own files general, structure, etc
 # Saving as multiple files may make it easier to edit sections.

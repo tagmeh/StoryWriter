@@ -7,7 +7,6 @@ import openai
 from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_general_schema
 from story_writer.story_data_model import GeneralData, StoryData
 from story_writer.utils import log_step, save_story_data
 
@@ -20,7 +19,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     Instructs the LLM to respond with a Title, Genre tags, and the Synopsis (Updated user_prompt input)
 
     :param client: Facilitates LLM connection and communication
-    :param user_prompt: User's initial input to generate a outline
+    :param user_prompt: User's initial input to generate am outline
     :return: Path to the directory containing the generated outline data
     """
     log.info("Generating Initial General Story Details (Title, Genres, Themes, and a Synopsis).")
@@ -30,13 +29,11 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
         {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
-    response_format: dict = story_general_schema
 
     general_story_data, elapsed = validated_stream_llm(
         client=client,
         messages=messages,
         model=model,
-        response_format=response_format,
         validation_model=GeneralData,
     )
 
@@ -54,7 +51,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
         file_name="expand_initial_prompt",
         model=FIRST_PASS_GENERATION_MODEL,
         settings={},
-        response_format=response_format,
+        response_model=GeneralData,
         duration=elapsed,
     )
 

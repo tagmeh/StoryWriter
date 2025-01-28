@@ -1,6 +1,5 @@
 from config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
-from story_writer.constants import StoryStructure
-from story_writer.story_data_model import ChapterData, StoryData
+from story_writer.story_data_model import ChapterData, StoryData, StoryStructure
 
 GENERAL_SYSTEM_PROMPT = (
     "You are an experienced story author. You fill your story with world building and character "
@@ -47,7 +46,7 @@ def generate_story_structure_prompt(story_structure: StoryStructure, story_data:
     :param story_data: The story data to use as a basis for generating the story structure.
     :return: A prompt to direct the LLM to generate a story structure.
     """
-    return f"""Generate a story structure/outline using the following story structure style: {story_structure.value}.
+    return f"""Generate a story structure/outline using the following story structure style: {story_structure.style}.
 Expand on each point in the story, adding details where appropriate. Avoid dialogue at this stage.
 
 Consider the protagonist's motivations and desires.

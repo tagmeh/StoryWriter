@@ -3,7 +3,7 @@ import logging
 import re
 import time
 from json import JSONDecodeError
-from typing import TypeVar
+from typing import TypeVar, Union
 
 import pydantic
 from pydantic import BaseModel
@@ -12,8 +12,10 @@ from config.story_settings import (
     LLM_EMPTY_OUTPUT_RETRY_COUNT,
     LLM_INVALID_OUTPUT_RETRY_COUNT,
 )
+from story_writer.story_data_model import create_json_schema, StoryStructure
 
 T = TypeVar("T", bound=BaseModel)
+SS = TypeVar("SS", bound=StoryStructure)
 
 log = logging.getLogger(__name__)
 
@@ -37,9 +39,8 @@ def validated_stream_llm(
     client,
     messages,
     model,
-    validation_model: type[T],
-    response_format: dict | None = None,
-) -> (type[T] | list[type[T]], float):
+    validation_model: type[T]
+) -> (type[Union[T, SS]] | list[type[T]], float):
     start = time.time()
     attempt = 0
     max_retries = LLM_INVALID_OUTPUT_RETRY_COUNT
@@ -48,7 +49,7 @@ def validated_stream_llm(
             client=client,
             messages=messages,
             model=model,
-            response_format=response_format,
+            response_format=create_json_schema(validation_model),
         )
 
         try:
@@ -78,7 +79,7 @@ def validated_stream_llm(
     return valid_model, elapsed
 
 
-def stream_llm(client, messages, model, response_format: str | None):
+def stream_llm(client, messages, model, response_format: dict | None):
     max_retries = LLM_EMPTY_OUTPUT_RETRY_COUNT
     retries = 0
 

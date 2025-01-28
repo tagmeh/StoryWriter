@@ -8,7 +8,6 @@ from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_p
 from config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_chapter_scene_schema
 from story_writer.story_data_model import SceneData, StoryData
 from story_writer.utils import load_story_data, save_story_data
 
@@ -48,7 +47,6 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
                 "content": generate_story_chapter_scene_prompt(story_data, chapter),
             },
         ]
-        response_format: dict = story_chapter_scene_schema
 
         max_retries = SCENES_PER_CHAPTER_RETRY_COUNT
         log.debug(f"Number of attempts to generate scenes: {SCENES_PER_CHAPTER_RETRY_COUNT}")
@@ -59,7 +57,6 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
                 client=client,
                 messages=messages,
                 model=model,
-                response_format=response_format,
                 validation_model=SceneData,
             )
 
@@ -93,7 +90,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             file_name=f"generate_scenes_for_chapter_{chapter.number}",
             model=model,
             settings={},
-            response_format=response_format,
+            response_model=response_format,
             duration=elapsed,
         )
     log.info("Scenes generated for all chapters. Story outline is complete.")

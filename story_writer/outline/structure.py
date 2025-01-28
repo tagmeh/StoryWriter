@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Type
 
 from openai import Client
 
@@ -6,20 +7,15 @@ from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_structure_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_structure_schema
-from story_writer.story_data_model import StoryData, StructureData
-from story_writer.story_structures import (
-    StoryStructure,
-    get_story_structure_model,
-    get_story_structure_schema,
-)
+from story_writer.story_data_model import StoryData
+from story_writer.story_structures import StoryStructureEnum, BaseModel
 from story_writer.utils import load_story_data, save_story_data
 
 
 def generate_story_structure(
     client: Client,
     story_root: Path,
-    story_structure: StoryStructure = StoryStructure.CLASSIC,
+    story_structure: Type[BaseModel] = StoryStructureEnum.CLASSIC,
 ):
     """
     Uses the LLM to generate the story structure based on the user's selected story structure.
@@ -37,29 +33,23 @@ def generate_story_structure(
         raise Exception("General story details do not exist, create a new story before generating the story structure.")
 
     model = FIRST_PASS_GENERATION_MODEL
-    instructions = generate_story_structure_prompt(story_structure, story_data)
+    print(f"{story_structure=}")
+    print(f"{story_structure.value=}")
+    instructions = generate_story_structure_prompt(story_structure.value, story_data)
     messages = [
         {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
-    response_format: dict = story_structure_schema
-    response_format["json_schema"]["schema"] = get_story_structure_schema(story_structure)
-
-    # Get the pydantic model used to validate the LLM's output.
-    story_structure_model = get_story_structure_model(story_structure)
 
     # Call to the LLM, should be able to trust the returned pydantic model.
     story_structure_data, elapsed = validated_stream_llm(
         client=client,
         messages=messages,
         model=model,
-        response_format=response_format,
-        validation_model=story_structure_model,
+        validation_model=story_structure.value,
     )
 
-    story_structure_data = StructureData(style=story_structure.value, structure=story_structure_data)
-
-    story_data.structure = story_structure_data
+    story_data.structure = story_structure.value(**story_structure_data)
 
     save_story_data(story_root, story_data)
 
@@ -69,6 +59,6 @@ def generate_story_structure(
         file_name="generate_story_structure",
         model=model,
         settings={},
-        response_format=response_format,
+        response_model=story_structure.value,
         duration=elapsed,
     )

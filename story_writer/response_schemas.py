@@ -31,29 +31,29 @@ story_structure_schema = {
     },
 }
 
-# Describes a response for the worldbuilding query.
-story_worldbuilding_schema = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "output",
-        "strict": "true",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "geography": {"type": "string"},
-                "culture": {"type": "string"},
-                "history": {"type": "string"},
-                "politics": {"type": "string"},
-                "economy": {"type": "string"},
-                "magic_technology": {"type": "string"},
-                "religion": {"type": "string"},
-                "additional_details": {"type": "string"},
-            },
-            "required": ["geography", "culture", "history", "politics", "economy", "magic_technology", "religion"],
-        },
-        "required": ["output"],
-    },
-}
+# # Describes a response for the worldbuilding query.
+# story_worldbuilding_schema = {
+#     "type": "json_schema",
+#     "json_schema": {
+#         "name": "output",
+#         "strict": "true",
+#         "schema": {
+#             "type": "object",
+#             "properties": {
+#                 "geography": {"type": "string"},
+#                 "culture": {"type": "string"},
+#                 "history": {"type": "string"},
+#                 "politics": {"type": "string"},
+#                 "economy": {"type": "string"},
+#                 "magic_technology": {"type": "string"},
+#                 "religion": {"type": "string"},
+#                 "additional_details": {"type": "string"},
+#             },
+#             "required": ["geography", "culture", "history", "politics", "economy", "magic_technology", "religion"],
+#         },
+#         "required": ["output"],
+#     },
+# }
 
 # Describes a response with an array of characters, each with
 #  a "name", "age", "reason in outline", "description", and "personality".
