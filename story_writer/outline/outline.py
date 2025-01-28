@@ -16,12 +16,12 @@ log = logging.getLogger(__name__)
 
 def generate_general_story_details(client: openai.Client, user_prompt) -> Path | None:
     """
-    Uses the LLM to expand and enhance the user_prompt input to create a complete story from end to end.
+    Uses the LLM to expand and enhance the user_prompt input to create a complete outline from end to end.
     Instructs the LLM to respond with a Title, Genre tags, and the Synopsis (Updated user_prompt input)
 
     :param client: Facilitates LLM connection and communication
-    :param user_prompt: User's initial input to generate a story
-    :return: Path to the directory containing the generated story data
+    :param user_prompt: User's initial input to generate a outline
+    :return: Path to the directory containing the generated outline data
     """
     log.info("Generating Initial General Story Details (Title, Genres, Themes, and a Synopsis).")
     model = FIRST_PASS_GENERATION_MODEL
@@ -67,6 +67,6 @@ if __name__ == "__main__":
     client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
 
     prompt = """
-        Create a story about a cat with superpowers.
+        Create a outline about a cat with superpowers.
         """
     generate_general_story_details(client, prompt)

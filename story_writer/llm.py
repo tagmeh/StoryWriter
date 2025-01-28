@@ -69,7 +69,7 @@ def validated_stream_llm(
             attempt += 1
 
     else:
-        log.error(f"Failed to get valid general story data in {max_retries} attempts.")
+        log.error(f"Failed to get valid story data in {max_retries} attempts.")
         raise Exception(
             f"Failed to get valid general story data in {max_retries} attempts. "
             f"The model '{model}' may not be suitable for this task. "
@@ -111,7 +111,7 @@ def stream_llm(
                 print(chunk.choices[0].delta.content or "", end="")
                 output += chunk.choices[0].delta.content or ""
         print("")  # Prevents the next print statement from being on the same line as the last chunk.
-        log.debug(f"Output: {len(output)=}")
+        log.debug(f"Output Length: {len(output)}")
 
         log.debug("Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.")
         output = remove_directional_single_quotes(output)

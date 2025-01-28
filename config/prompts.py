@@ -2,7 +2,8 @@ from config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINI
 from story_writer.story_data_model import ChapterData, StoryData
 from story_writer.story_structures import StoryStructure
 
-GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character defining details to fill out the story."
+GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character " \
+                        "defining details to fill out the story."
 
 
 def expand_user_input_prompt(user_input: str) -> str:
@@ -25,11 +26,14 @@ Add details to the story to make it more engaging and interesting.
 
 Who is the protagonist? What are their goals and motivations?
 Who or what is the antagonist? What is their goal?
-What are the main conflicts in the story?
+What are the main conflicts in the outline?
+What are the stakes of the story?
+
+Be as detailed as possible.
 
 User Input: {user_input}
 
-Respond with some title options, the genre tags, a general themes, and the synopsis.
+Respond with some title options, the genre tags, a general themes, and the expanded synopsis.
 """
 
 
@@ -56,13 +60,33 @@ Synopsis: {story_data.general.synopsis}
 """
 
 
+def generate_worldbuilding_prompt(story_data: StoryData) -> str:
+    instructions = f"""Describe the world and setting of the story. What's the tone of the story or this part of the 
+world? What are some key elements of the world that the story should acknowledge? Why is the worldbuilding details
+relevant to the story? How does the protagonist relate to the world or their area?
+
+User Input:
+Title: {story_data.general.title}
+Themes: {", ".join(story_data.general.themes)}
+Genre: {", ".join(story_data.general.genres)}
+Synopsis: {story_data.general.synopsis}
+
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
+"""
+    # for key, value in story_data.structure.model_dump(mode="python").items():
+    #     if not key.startswith("_"):
+    #         instructions += f" {key}: {value}\n"
+
+    return instructions
+
+
 def generate_story_characters_prompt(story_data: StoryData) -> str:
     """
 
     :param story_data:
     :return:
     """
-    instructions = f"""Generate a list of the characters in this story. Define the protagonist, their allies, love interests, friends,
+    return f"""Generate a list of the characters in this story. Define the protagonist, their allies, love interests, friends,
 family, enemies, and people who pose as obstacles.
 
 What are the ages of these characters.
@@ -77,13 +101,8 @@ Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 Synopsis: {story_data.general.synopsis}
 
-Story Structure/Outline:\n
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
 """
-    for key, value in story_data.structure.model_dump(mode="python").items():
-        if not key.startswith("_"):
-            instructions += f" {key}: {value}\n"
-
-    return instructions
 
 
 def generate_story_chapters_prompt(story_data: StoryData) -> str:
@@ -92,7 +111,7 @@ def generate_story_chapters_prompt(story_data: StoryData) -> str:
     :param story_data:
     :return:
     """
-    instructions = f"""Define {CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
+    return f"""Define {CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
 Use the Title, Genres, Themes, story synopsis, and story structure to generate chapters.
 
 Define the chapter title.
@@ -109,12 +128,8 @@ Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 Synopsis: {story_data.general.synopsis}
 
-Story Structure/Outline:\n
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
 """
-    for key, value in story_data.structure.model_dump(mode="python").items():
-        instructions += f" {key}: {value}\n"
-
-    return instructions
 
 
 def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
