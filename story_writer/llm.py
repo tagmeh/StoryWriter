@@ -39,11 +39,10 @@ def validated_stream_llm(
     model,
     validation_model: type[T],
     response_format: dict | None = None,
-    max_retries: int = LLM_INVALID_OUTPUT_RETRY_COUNT,
 ) -> (type[T] | list[type[T]], float):
     start = time.time()
-    max_retries = max_retries
     attempt = 0
+    max_retries = LLM_INVALID_OUTPUT_RETRY_COUNT
     while attempt < max_retries:
         content = stream_llm(
             client=client,
@@ -83,10 +82,9 @@ def stream_llm(
     client,
     messages,
     model,
-    response_format: str | None,
-    max_retries: int = LLM_EMPTY_OUTPUT_RETRY_COUNT,
+    response_format: str | None
 ):
-    max_retries = max_retries
+    max_retries = LLM_EMPTY_OUTPUT_RETRY_COUNT
     retries = 0
 
     # Output the message contents for use in testing manually.

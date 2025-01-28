@@ -60,7 +60,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
                 messages=messages,
                 model=model,
                 response_format=response_format,
-                validation_model=SceneData,
+                validation_model=SceneData
             )
 
             if len(content) < SCENES_PER_CHAPTER_MINIMUM_COUNT:
