@@ -6,8 +6,7 @@ from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapters_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_chapters_schema
-from story_writer.story_data_model import ChapterData, StoryData
+from story_writer.story_data_model import ChapterData, StoryData, create_json_schema
 from story_writer.utils import load_story_data, save_story_data
 
 
@@ -27,13 +26,12 @@ def generate_chapters(client: Client, story_root: Path):
         },
         {"role": "user", "content": generate_story_chapters_prompt(story_data)},
     ]
-    response_format: dict = story_chapters_schema
 
     content, elapsed = validated_stream_llm(
         client=client,
         messages=messages,
         model=model,
-        response_format=response_format,
+        response_format=create_json_schema(ChapterData),
         validation_model=ChapterData,
     )
 
@@ -50,6 +48,6 @@ def generate_chapters(client: Client, story_root: Path):
         file_name="generate_chapters",
         model=model,
         settings={},
-        response_format=response_format,
+        response_model=response_format,
         duration=elapsed,
     )

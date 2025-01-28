@@ -1,9 +1,12 @@
 import json
 import logging
 from pathlib import Path
+from typing import Type, Any
+
+from pydantic import BaseModel
 
 from config.story_settings import CONSOLIDATE_SAVED_OUTPUT, SAVE_STORY_FILE_TYPE
-from story_writer.story_data_model import StoryData
+from story_writer.story_data_model import StoryData, create_json_schema
 
 log = logging.getLogger(__name__)
 
@@ -16,8 +19,8 @@ def log_step(
     model: str,
     messages: list,
     settings: dict,
-    response_format: dict,
     duration: float,
+    response_model: Type[BaseModel] | None = None,
 ):
     """
     Generates logs per-outline in order to inspect the inputs and outputs of the LLM calls, per function.
@@ -27,7 +30,7 @@ def log_step(
     :param file_name:
     :param model:
     :param settings:
-    :param response_format:
+    :param response_model:
     :param duration:
 
     :return:
@@ -39,7 +42,7 @@ def log_step(
         "messages": messages,
         "model": model,
         "settings": settings,
-        "response_format": response_format,
+        "response_format": create_json_schema(response_model),
         "response_time": duration,
     }
 

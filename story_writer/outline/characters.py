@@ -7,7 +7,6 @@ from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_characters_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
-from story_writer.response_schemas import story_characters_schema
 from story_writer.story_data_model import CharacterData, StoryData
 from story_writer.utils import load_story_data, save_story_data
 
@@ -26,14 +25,12 @@ def generate_characters(client: Client, story_root: Path):
         {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
-    response_format: dict = story_characters_schema
 
     # Todo: Potentially add a "Have enough characters" validator, if not, rerun validated_stream_llm
     content, elapsed = validated_stream_llm(
         client=client,
         messages=messages,
         model=model,
-        response_format=response_format,
         validation_model=CharacterData,
     )
 
@@ -46,7 +43,7 @@ def generate_characters(client: Client, story_root: Path):
         messages=messages,
         file_name="generate_characters",
         model=model,
+        response_model=CharaterData,
         settings={},
-        response_format=response_format,
         duration=elapsed,
     )
