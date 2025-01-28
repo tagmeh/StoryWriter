@@ -1,9 +1,16 @@
+import json
+import logging
 import re
-from typing import Annotated, Any, Generic, TypeVar
+from pathlib import Path
+from typing import Annotated, Any, Generic, TypeVar, Literal, Type
 
 from pydantic import AfterValidator, BaseModel, field_validator
 
+log = logging.getLogger(__name__)
+
 T = TypeVar("T", bound=BaseModel)
+CBM = TypeVar("CBM", bound="CustomBaseModel")
+
 
 # Todo: Determine if using this neat DeferredModel is needed for the StoryData model.
 #  Problem: We wanted to validate the StoryData object, but for most of it's outline-generating
@@ -45,7 +52,7 @@ class CustomBaseModel(BaseModel):
         Use a `"".join([model.list_key_values_str for model in parent_model.child_model_array])`
           when converting an array of models into an array of formatted strings.
 
-        Example output:
+        Example output (of the 7 Pinch Point Structure Model):
          hook: In the sprawling metropolis of Purrth, <truncated> extraordinary superhero 'Feline Fury'.
          plot_turn_1: Kit gains her powers after <truncated> where felines hold power.
          pinch_point_1: As Kit continues to battle crime, <truncated> grapples with her own identity.
@@ -60,6 +67,35 @@ class CustomBaseModel(BaseModel):
             if not key.startswith("_"):
                 output += f" {key}: {value}\n"
         return output
+
+    def save_to_file(self, output_dir: Path, file_type: str, filename: str = None):
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        file_path = output_dir / (f"{filename}.{file_type}" or f"{self.__class__.__name__}.{file_type}")
+
+        try:
+            if file_type == 'json':
+                with open(file_path, mode="w+", encoding="utf-8") as f:
+                    json.dump(self.model_dump(mode='json'), f, indent=4)
+            elif file_type == 'yaml':
+                with open(file_path, mode="w+", encoding="utf-8") as f:
+                    yaml.dump(story_data.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
+        except Exception:
+            log.error(f"Unable to save file '{file_path}'")
+            raise
+
+    @classmethod
+    def load_from_file(cls: Type[CBM], file_type: Literal["json", "yaml"], file_path: Path) -> CBM:
+        if file_type == "json":
+            with open(file_path, mode="r", encoding="utf-8") as f:
+                data = json.load(f)
+        elif file_type == "yaml":
+            with open(file_path, mode="r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+        else:
+            raise Exception(f"File type: '{file_type}' not supported.")
+
+        return cls(**data)
 
 
 class StoryStructure(CustomBaseModel):
@@ -235,20 +271,20 @@ class GeneralData(CustomBaseModel):
         return value
 
 
-class StoryStructureData(CustomBaseModel):
+class StructureData(CustomBaseModel):
     style: str  # e.g. "Three-Act Structure"
     structure: (
-        ClassicStoryStructure
-        | ThreeActStructure
-        | FiveActStructure
-        | SevenPointStoryStructure
-        | FreytagsPyramidStoryStructure
-        | TheHerosJourneyStoryStructure
-        | DanHarmonsStoryCircleStructure
-        | StorySpine
-        | FichteanCurveStructure
-        | InMediasRes
-        | SaveTheCatStructure
+            ClassicStoryStructure
+            | ThreeActStructure
+            | FiveActStructure
+            | SevenPointStoryStructure
+            | FreytagsPyramidStoryStructure
+            | TheHerosJourneyStoryStructure
+            | DanHarmonsStoryCircleStructure
+            | StorySpine
+            | FichteanCurveStructure
+            | InMediasRes
+            | SaveTheCatStructure
     )
 
 
@@ -272,6 +308,13 @@ class CharacterData(CustomBaseModel):
     description: Annotated[str, AfterValidator(str_not_empty)]
     personality: Annotated[str, AfterValidator(str_not_empty)]
 
+    def save_to_file(self, output_dir: Path, file_type: Literal["json", "yaml"], filename: str = None):
+        super().save_to_file(output_dir=output_dir, file_type=file_type, filename=f"{self.name}")
+
+    @classmethod
+    def load_from_file(cls: Type[CBM], file_type: Literal["json", "yaml"], file_path: Path) -> CBM:
+        return super().load_from_file(file_path=file_path, file_type=file_type)
+
 
 class ChapterCharacterData(CustomBaseModel):
     name: Annotated[str, AfterValidator(str_not_empty)]
@@ -286,6 +329,9 @@ class SceneData(CustomBaseModel):
     misc: str | None = None
     story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
 
+    def save_to_file(self, output_dir: Path, file_type: Literal["json", "yaml"], filename: str = None):
+        super().save_to_file(output_dir=output_dir, file_type=file_type, filename=filename)
+
 
 class ChapterData(CustomBaseModel):
     title: Annotated[str, AfterValidator(str_not_empty)]
@@ -296,10 +342,153 @@ class ChapterData(CustomBaseModel):
     synopsis: Annotated[str, AfterValidator(str_not_empty)]
     scenes: list[SceneData] = []
 
+    def save_to_file(self, output_dir: Path, file_type: Literal["json", "yaml"], filename: str = None):
+        """
+
+        :param output_dir: This is the /chapterdata/ directory
+        :param file_type: json or yaml, based on a user setting
+        :param filename: None
+        :return: None, creates a /Chapter-n/ directory and saves the chapter and scenes within that dir.
+        """
+        chapter_dir = output_dir / f"Chapter-{self.number}"
+        chapter_dir.mkdir(exist_ok=True)
+        super().save_to_file(output_dir=chapter_dir, file_type=file_type, filename=f"chapter-{self.number}")
+
+        if self.scenes:
+            for scene in self.scenes:
+                scene.save_to_file(output_dir=chapter_dir, file_type=file_type, filename=f"scene-{self.number}")
+
+    @classmethod
+    def load_from_file(cls: Type[CBM], file_type: Literal["json", "yaml"], file_path: Path) -> CBM:
+        # Load chapter data
+        print(f"chapter file path {file_path=}")
+        chapter_file = file_path / f"chapter-{file_path.name.split('-')[-1]}.{file_type}"
+        if file_type == "json":
+            with open(chapter_file, mode="r", encoding="utf-8") as f:
+                chapter_data = json.load(f)
+        elif file_type == "yaml":
+            with open(chapter_file, mode="r", encoding="utf-8") as f:
+                chapter_data = yaml.safe_load(f)
+        else:
+            raise Exception(f"File type: '{file_type}' not supported.")
+
+        scenes = []
+        for scene_file in sorted(file_path.glob(f"scene-*.{file_type}")):
+            print(f"{scene_file=}")
+            scenes.append(SceneData.load_from_file(file_type=file_type, file_path=scene_file))
+
+        chapter_data["scenes"] = scenes
+
+        return cls(**chapter_data)
+
 
 class StoryData(CustomBaseModel):
     general: GeneralData | None = None
-    structure: StoryStructureData | None = None
+    structure: StructureData | None = None
     worldbuilding: WorldbuildingData | None = None
     characters: list[CharacterData] | None = None
     chapters: list[ChapterData] | None = None
+
+    def __str__(self):
+        return f"{self.general.title}"
+
+    def save_to_file(self, output_dir: Path, file_type: str, filename: str = None, one_file: bool = True):
+        """
+        Saves the StoryData output depending on a couple of settings.
+        :param output_dir: Should be /stories/
+        :param file_type: json or yaml, based on user setting.
+        :param filename: None
+        :param one_file: bool - If True, saves the StoryData data as one file: "story_data.*" Otherwise, save files separately
+        :return:
+        """
+        # story_dir = output_dir / self.general.title
+        story_dir = output_dir
+        story_dir.mkdir(parents=True, exist_ok=True)
+
+        if one_file:
+            # Save the data into one file as either a json or yaml file.
+            story_data_path = story_dir / f"story_data.{file_type}"
+            log.debug(f'Saving/Updating outline data to {story_data_path}')
+
+            if file_type == 'yaml':
+                with open(story_data_path, mode="w+", encoding="utf-8") as f:
+                    yaml.dump(self.model_dump(mode="python"), f, default_flow_style=False, sort_keys=False)
+
+            elif file_type == 'json':
+                with open(story_data_path, mode="w+", encoding="utf-8") as f:
+                    json.dump(self.model_dump(mode='json'), f, indent=4, sort_keys=False)
+
+            else:
+                log.error(f"Failed to save story data, save type is invalid: {file_type}")
+
+        else:
+            # Save each property separately (dicts as files, lists as files within a directory)
+            for key, value in self.model_dump(mode='python').items():
+                if value is None:
+                    continue  # Prevents creating empty files/folders
+
+                if isinstance(value, list):
+                    # Create the subdirectory for the list of x
+                    list_dir = story_dir / key
+                    list_dir.mkdir(exist_ok=True)
+                    print(f"{value=}")
+                    for character in self.__getattribute__(key):
+                        print(f"{character=}")
+                        character.save_to_file(output_dir=list_dir, file_type=file_type)
+
+                elif isinstance(value, dict):
+                    self.__getattribute__(key).save_to_file(output_dir=story_dir, file_type=file_type,
+                                                            filename=f"{key}")
+
+    @classmethod
+    def load_from_file(cls: Type[CBM], saved_dir: Path, file_type: Literal["json", "yaml"],
+                       one_file: bool = True) -> "StoryData":
+        if one_file:
+            story_data_path = saved_dir / f"story_data.{file_type}"
+            log.debug(f"Loading outline data from '{story_data_path}'")
+
+            if file_type == 'yaml':
+                with open(story_data_path, mode="r", encoding="utf-8") as f:
+                    return StoryData(**yaml.safe_load(f))
+
+            elif file_type == 'json':
+                with open(story_data_path, mode="r", encoding="utf-8") as f:
+                    return StoryData(**json.load(fp=f))
+            else:
+                log.error(f"Failed to load story data, save type is invalid: {file_type}")
+
+        else:
+            story_data = {}
+            for key in ["general", "structure", "worldbuilding"]:
+                file = saved_dir / f"{key}.{file_type}"
+                if file.exists():
+                    print(f"{key} {file=}")
+                    story_data[key] = globals()[key.capitalize() + "Data"].load_from_file(
+                        file_type=file_type, file_path=file)
+
+            char_dir = saved_dir / "characters"
+            if char_dir.exists():
+                characters = []
+                for char_file in char_dir.glob("*.json"):
+                    characters.append(CharacterData.load_from_file(file_type=file_type, file_path=char_file))
+                story_data["characters"] = characters
+
+            chapter_dir = saved_dir / "chapters"
+            if chapter_dir.exists():
+                chapters = []
+                for chapter_subdir in sorted(chapter_dir.iterdir()):
+                    if chapter_subdir.is_dir():
+                        chapters.append(ChapterData.load_from_file(file_type=file_type, file_path=chapter_subdir))
+                story_data["chapters"] = chapters
+
+            return cls(**story_data)
+
+
+if __name__ == '__main__':
+    import yaml
+
+    with open('../stories/Radioactive Whiskers - 1738030968435/story_data.yaml', 'r', encoding='utf-8') as f:
+        story_data = StoryData(**yaml.safe_load(f))
+
+    print(story_data)
+

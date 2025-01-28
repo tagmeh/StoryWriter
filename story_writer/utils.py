@@ -2,8 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-import yaml
-
+from config.story_settings import SAVE_STORY_FILE_TYPE, CONSOLIDATE_SAVED_OUTPUT
 from story_writer.story_data_model import StoryData
 
 log = logging.getLogger(__name__)
@@ -12,13 +11,13 @@ log = logging.getLogger(__name__)
 # TODO: Update settings such that it's passed into the llm call and logged.
 #  Settings might be anything beyond the absolute required inputs, like "stream" and "stream_options".
 def log_step(
-    story_root: Path,
-    file_name: str,
-    model: str,
-    messages: list,
-    settings: dict,
-    response_format: dict,
-    duration: float,
+        story_root: Path,
+        file_name: str,
+        model: str,
+        messages: list,
+        settings: dict,
+        response_format: dict,
+        duration: float,
 ):
     """
     Generates logs per-outline in order to inspect the inputs and outputs of the LLM calls, per function.
@@ -49,10 +48,11 @@ def log_step(
 
 
 def load_story_data(story_path: Path):
-    story_data_path = story_path / "story_data.yaml"
-    log.debug(f"Loading outline data from '{story_data_path}'")
-    with open(story_data_path, encoding="utf-8") as f:
-        return StoryData(**yaml.safe_load(f))
+    return StoryData.load_from_file(
+        saved_dir=story_path,
+        file_type=SAVE_STORY_FILE_TYPE.value,
+        one_file=CONSOLIDATE_SAVED_OUTPUT
+    )
 
 
 def save_story_data(story_path: Path, story_data: StoryData) -> None:
@@ -63,11 +63,9 @@ def save_story_data(story_path: Path, story_data: StoryData) -> None:
     :param story_data: StoryData - Pydantic model representation of the cached/saved outline data.
     :return: None
     """
-    story_data_path = story_path / "story_data.yaml"
-    log.debug(f'Saving/Updating outline data to {story_path / "story_data.yaml"}')
-
-    # TODO: May update this section to allow for json or yaml outputs dictated by user setting.
-    with open(story_data_path, mode="w+", encoding="utf-8") as f:
-        yaml.dump(story_data.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
-
+    story_data.save_to_file(
+        output_dir=story_path,
+        file_type=SAVE_STORY_FILE_TYPE.value,
+        one_file=CONSOLIDATE_SAVED_OUTPUT
+    )
     log.debug(f"Saved/Updated outline data for story: '{story_data.general.title}'")

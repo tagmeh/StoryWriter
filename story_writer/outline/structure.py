@@ -7,7 +7,7 @@ from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_structure_promp
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_structure_schema
-from story_writer.story_data_model import StoryData, StoryStructureData
+from story_writer.story_data_model import StoryData, StructureData
 from story_writer.story_structures import (
     StoryStructure,
     get_story_structure_model,
@@ -57,7 +57,7 @@ def generate_story_structure(
         validation_model=story_structure_model,
     )
 
-    story_structure_data = StoryStructureData(style=story_structure.value, structure=story_structure_data)
+    story_structure_data = StructureData(style=story_structure.value, structure=story_structure_data)
 
     story_data.structure = story_structure_data
 
