@@ -377,6 +377,9 @@ class ChapterData(CustomBaseModel):
             print(f"{scene_file=}")
             scenes.append(SceneData.load_from_file(file_type=file_type, file_path=scene_file))
 
+        # TODO: Know that the scenes are still saved with the chapter.
+        #  Possible way of going about it, solution?, is to save the scenes then clear them from the chapter,
+        #  maybe with a message indicating the files are saved separately.
         chapter_data["scenes"] = scenes
 
         return cls(**chapter_data)
@@ -441,6 +444,9 @@ class StoryData(CustomBaseModel):
                         output_dir=story_dir, file_type=file_type, filename=f"{key}"
                     )
 
+    # TODO: The load feature needs to do one of two things:
+    #  1) Try to load the data both ways (consolidated/Not consolidated) because the style of saving can change between stories.
+    #  2) Save a settings.json or similar for each story, then reference that to determine style of saving, file_type, ect.
     @classmethod
     def load_from_file(
         cls: type[CBM], saved_dir: Path, file_type: Literal["json", "yaml"], one_file: bool = True
