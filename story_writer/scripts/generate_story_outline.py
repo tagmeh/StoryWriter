@@ -76,4 +76,3 @@ def generate_story_outline(client: Client, prompt: str) -> None:
     generate_chapters(client, story_root)
 
     generate_scenes_for_chapter(client, story_root)
-

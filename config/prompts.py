@@ -1,9 +1,11 @@
 from config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
-from story_writer.story_data_model import ChapterData, StoryData
 from story_writer.constants import StoryStructure
+from story_writer.story_data_model import ChapterData, StoryData
 
-GENERAL_SYSTEM_PROMPT = "You are an experienced story author. You fill your story with world building and character " \
-                        "defining details to fill out the story."
+GENERAL_SYSTEM_PROMPT = (
+    "You are an experienced story author. You fill your story with world building and character "
+    "defining details to fill out the story."
+)
 
 
 def expand_user_input_prompt(user_input: str) -> str:
