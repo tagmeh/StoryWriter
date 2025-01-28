@@ -47,17 +47,9 @@ story_worldbuilding_schema = {
                 "economy": {"type": "string"},
                 "magic_technology": {"type": "string"},
                 "religion": {"type": "string"},
-                "additional_details": {"type": "string"}
+                "additional_details": {"type": "string"},
             },
-            "required": [
-                "geography",
-                "culture",
-                "history",
-                "politics",
-                "economy",
-                "magic_technology",
-                "religion"
-            ],
+            "required": ["geography", "culture", "history", "politics", "economy", "magic_technology", "religion"],
         },
         "required": ["output"],
     },

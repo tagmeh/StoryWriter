@@ -8,7 +8,7 @@ from config.prompts import GENERAL_SYSTEM_PROMPT, generate_worldbuilding_prompt
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_worldbuilding_schema
-from story_writer.story_data_model import WorldbuildingData, StoryData
+from story_writer.story_data_model import StoryData, WorldbuildingData
 from story_writer.utils import load_story_data, save_story_data
 
 log = logging.getLogger(__name__)

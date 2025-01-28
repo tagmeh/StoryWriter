@@ -5,7 +5,7 @@ from openai import Client
 
 from config.models import FIRST_PASS_GENERATION_MODEL
 from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_prompt
-from config.story_settings import SCENES_PER_CHAPTER_RETRY_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
+from config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.response_schemas import story_chapter_scene_schema
@@ -31,7 +31,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
         story_structure_seed_str = (
             f"{story_data.structure.style}\n"
             f"{chapter.story_structure_point} - "
-            # Get only the relevant story structure point. 
+            # Get only the relevant story structure point.
             # Uses a normalized story structure style to pull the correct section.
             f"{story_data.structure.structure.model_dump(mode='python').get(chapter.story_structure_point.replace(' ', '_').lower(), 'Chapter outline structure point not found in generated outline structure.')}"
         )
@@ -60,15 +60,17 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
                 messages=messages,
                 model=model,
                 response_format=response_format,
-                validation_model=SceneData
+                validation_model=SceneData,
             )
 
             if len(content) < SCENES_PER_CHAPTER_MINIMUM_COUNT:
-                log.warning(f"LLM returned fewer than {SCENES_PER_CHAPTER_MINIMUM_COUNT} "
-                            f"scenes for chapter {chapter.number}. This is a user-setting. If the LLM model "
-                            f"continues to fail, try updating the scene-generator prompt or lowering the minimum "
-                            f"scenes per chapter in config/story_settings.py - SCENES_PER_CHAPTER_MINIMUM_COUNT. "
-                            f"Retrying...")
+                log.warning(
+                    f"LLM returned fewer than {SCENES_PER_CHAPTER_MINIMUM_COUNT} "
+                    f"scenes for chapter {chapter.number}. This is a user-setting. If the LLM model "
+                    f"continues to fail, try updating the scene-generator prompt or lowering the minimum "
+                    f"scenes per chapter in config/story_settings.py - SCENES_PER_CHAPTER_MINIMUM_COUNT. "
+                    f"Retrying..."
+                )
                 attempts += 1
             else:
                 log.debug(f"Generated {len(content)} scenes for chapter {chapter.number}.")
@@ -94,4 +96,4 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             response_format=response_format,
             duration=elapsed,
         )
-    log.info(f"Scenes generated for all chapters. Story outline is complete.")
+    log.info("Scenes generated for all chapters. Story outline is complete.")

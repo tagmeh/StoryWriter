@@ -1,4 +1,4 @@
-from story_writer.constants import StoryStructure, StorySaveFormat
+from story_writer.constants import StorySaveFormat, StoryStructure
 
 # STORY SETTINGS ======================================================================
 # The type of outline/structure generated to help keep the outline on track.

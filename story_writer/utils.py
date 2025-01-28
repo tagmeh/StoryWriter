@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from config.story_settings import SAVE_STORY_FILE_TYPE, CONSOLIDATE_SAVED_OUTPUT
+from config.story_settings import CONSOLIDATE_SAVED_OUTPUT, SAVE_STORY_FILE_TYPE
 from story_writer.story_data_model import StoryData
 
 log = logging.getLogger(__name__)
@@ -11,13 +11,13 @@ log = logging.getLogger(__name__)
 # TODO: Update settings such that it's passed into the llm call and logged.
 #  Settings might be anything beyond the absolute required inputs, like "stream" and "stream_options".
 def log_step(
-        story_root: Path,
-        file_name: str,
-        model: str,
-        messages: list,
-        settings: dict,
-        response_format: dict,
-        duration: float,
+    story_root: Path,
+    file_name: str,
+    model: str,
+    messages: list,
+    settings: dict,
+    response_format: dict,
+    duration: float,
 ):
     """
     Generates logs per-outline in order to inspect the inputs and outputs of the LLM calls, per function.
@@ -49,9 +49,7 @@ def log_step(
 
 def load_story_data(story_path: Path):
     return StoryData.load_from_file(
-        saved_dir=story_path,
-        file_type=SAVE_STORY_FILE_TYPE.value,
-        one_file=CONSOLIDATE_SAVED_OUTPUT
+        saved_dir=story_path, file_type=SAVE_STORY_FILE_TYPE.value, one_file=CONSOLIDATE_SAVED_OUTPUT
     )
 
 
@@ -64,8 +62,6 @@ def save_story_data(story_path: Path, story_data: StoryData) -> None:
     :return: None
     """
     story_data.save_to_file(
-        output_dir=story_path,
-        file_type=SAVE_STORY_FILE_TYPE.value,
-        one_file=CONSOLIDATE_SAVED_OUTPUT
+        output_dir=story_path, file_type=SAVE_STORY_FILE_TYPE.value, one_file=CONSOLIDATE_SAVED_OUTPUT
     )
     log.debug(f"Saved/Updated outline data for story: '{story_data.general.title}'")

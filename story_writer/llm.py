@@ -78,12 +78,7 @@ def validated_stream_llm(
     return valid_model, elapsed
 
 
-def stream_llm(
-    client,
-    messages,
-    model,
-    response_format: str | None
-):
+def stream_llm(client, messages, model, response_format: str | None):
     max_retries = LLM_EMPTY_OUTPUT_RETRY_COUNT
     retries = 0
 
