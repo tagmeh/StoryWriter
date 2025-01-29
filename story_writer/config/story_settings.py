@@ -16,7 +16,7 @@ SAVE_STORY_FILE_TYPE = StorySaveFormatEnum.JSON  # JSON or YAML
 
 # If False, will save each of the different sections of the story_data as their own files general, structure, etc
 # Saving as multiple files may make it easier to edit sections.
-CONSOLIDATE_SAVED_OUTPUT = False
+CONSOLIDATE_SAVED_OUTPUT = True
 
 # TODO: Add -1 option to try forever.
 #  Add warning that this will create an infinite loop, until such a time that the data is collected.

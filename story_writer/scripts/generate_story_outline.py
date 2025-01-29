@@ -1,6 +1,6 @@
 from openai import Client
 
-from config.story_settings import STORY_STRUCTURE_STYLE
+from story_writer.config.story_settings import STORY_STRUCTURE_STYLE
 from story_writer.outline.chapters import generate_chapters
 from story_writer.outline.characters import generate_characters
 from story_writer.outline.outline import generate_general_story_details

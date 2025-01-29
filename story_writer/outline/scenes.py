@@ -3,13 +3,13 @@ from pathlib import Path
 
 from openai import Client
 
-from config.models import FIRST_PASS_GENERATION_MODEL
-from config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_prompt
-from config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT
+from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
+from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_prompt
+from story_writer.config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT
 from story_writer import utils
 from story_writer.llm import validated_stream_llm
 from story_writer.story_data_model import SceneData, StoryData
-from story_writer.utils import load_story_data, save_story_data
+# from story_writer.utils import load_story_data, save_story_data
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,8 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
     """
     For each chapter, generate a few scenes based on the chapter synopsis, location, and characters.
     """
-    story_data: StoryData = load_story_data(story_path=story_root)
+    # story_data: StoryData = load_story_data(story_path=story_root)
+    story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
     log.debug(f"Generating Scenes for outline: {story_data.general.title}")
 
     # Generate a non-json string block to seed the context before each scene.
@@ -32,7 +33,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             f"{chapter.story_structure_point} - "
             # Get only the relevant story structure point.
             # Uses a normalized story structure style to pull the correct section.
-            f"{story_data.structure.structure.model_dump(mode='python').get(chapter.story_structure_point.replace(' ', '_').lower(), 'Chapter outline structure point not found in generated outline structure.')}"
+            f"{story_data.structure.model_dump(mode='python').get(chapter.story_structure_point.replace(' ', '_').lower(), 'Chapter outline structure point not found in generated outline structure.')}"
         )
 
         log.info(f"Generating scenes for chapter {chapter.number}.")
@@ -82,7 +83,8 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
 
         chapter.scenes = content
 
-        save_story_data(story_root, story_data)
+        # save_story_data(story_root, story_data)
+        story_data.save_to_file(output_dir=story_root)
 
         utils.log_step(
             story_root=story_root,
@@ -90,7 +92,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             file_name=f"generate_scenes_for_chapter_{chapter.number}",
             model=model,
             settings={},
-            response_model=response_format,
+            response_model=SceneData,
             duration=elapsed,
         )
     log.info("Scenes generated for all chapters. Story outline is complete.")
