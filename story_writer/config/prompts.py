@@ -1,5 +1,6 @@
-from config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
-from story_writer.story_data_model import ChapterData, StoryData, StoryStructure
+from story_writer.config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
+from story_writer.constants import StoryStructureEnum
+from story_writer.story_data_model import ChapterData, StoryData
 
 GENERAL_SYSTEM_PROMPT = (
     "You are an experienced story author. You fill your story with world building and character "
@@ -38,7 +39,7 @@ Respond with some title options, the genre tags, a general themes, and the expan
 """
 
 
-def generate_story_structure_prompt(story_structure: StoryStructure, story_data: StoryData) -> str:
+def generate_story_structure_prompt(story_structure: StoryStructureEnum, story_data: StoryData) -> str:
     """
     Returns a prompt to direct the LLM to generate a story structure based on the story data provided.
 
@@ -46,7 +47,7 @@ def generate_story_structure_prompt(story_structure: StoryStructure, story_data:
     :param story_data: The story data to use as a basis for generating the story structure.
     :return: A prompt to direct the LLM to generate a story structure.
     """
-    return f"""Generate a story structure/outline using the following story structure style: {story_structure.style}.
+    return f"""Generate a story structure/outline using the following story structure style: {story_structure.value}.
 Expand on each point in the story, adding details where appropriate. Avoid dialogue at this stage.
 
 Consider the protagonist's motivations and desires.
@@ -72,7 +73,7 @@ Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 Synopsis: {story_data.general.synopsis}
 
-Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.list_key_values_str()}
 """
     # for key, value in story_data.structure.model_dump(mode="python").items():
     #     if not key.startswith("_"):
@@ -102,7 +103,7 @@ Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 Synopsis: {story_data.general.synopsis}
 
-Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.list_key_values_str()}
 """
 
 
@@ -129,7 +130,7 @@ Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}
 Synopsis: {story_data.general.synopsis}
 
-Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.structure.list_key_values_str()}
+Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.list_key_values_str()}
 """
 
 

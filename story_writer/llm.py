@@ -8,7 +8,7 @@ from typing import TypeVar, Union
 import pydantic
 from pydantic import BaseModel
 
-from config.story_settings import (
+from story_writer.config.story_settings import (
     LLM_EMPTY_OUTPUT_RETRY_COUNT,
     LLM_INVALID_OUTPUT_RETRY_COUNT,
 )
@@ -54,8 +54,10 @@ def validated_stream_llm(
 
         try:
             if isinstance(content, dict):
+                log.debug("Validating Dict-style output.")
                 valid_model = validation_model(**content)
             elif isinstance(content, list):
+                log.debug("Validating List-style output.")
                 valid_model = [validation_model(**item) for item in content]
             else:
                 log.error(f"LLM Output: '{content}' is not supported.")
@@ -96,7 +98,7 @@ def stream_llm(client, messages, model, response_format: dict | None):
             response_format=response_format,
             stream=True,
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
-            temperature=0.85,
+            temperature=0.85
         )
 
         output = ""

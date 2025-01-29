@@ -4,11 +4,11 @@ from pathlib import Path
 
 import openai
 
-from config.models import FIRST_PASS_GENERATION_MODEL
-from config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
+from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
+from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
 from story_writer.llm import validated_stream_llm
 from story_writer.story_data_model import GeneralData, StoryData
-from story_writer.utils import log_step, save_story_data
+from story_writer.utils import log_step
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
 
     story_data = StoryData(general=general_story_data)  # Initial StoryData creation.
 
-    save_story_data(story_root, story_data)
+    story_data.save_to_file(output_dir=story_root)
 
     log_step(
         story_root=story_root,
@@ -56,14 +56,3 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     )
 
     return story_root
-
-
-if __name__ == "__main__":
-    from openai import OpenAI
-
-    client = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
-
-    prompt = """
-        Create a outline about a cat with superpowers.
-        """
-    generate_general_story_details(client, prompt)
