@@ -2,11 +2,12 @@ from pathlib import Path
 
 from openai import Client
 
+from story_writer import utils, settings
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapters_prompt
-from story_writer import utils
-from story_writer.llm import validated_stream_llm
-from story_writer.story_data_model import ChapterData, StoryData
+from story_writer.llm import get_validated_llm_output
+from story_writer.models.outline import StoryData
+from story_writer.models.outline_models import ChapterData
 
 
 def generate_chapters(client: Client, story_root: Path):
@@ -26,10 +27,12 @@ def generate_chapters(client: Client, story_root: Path):
         {"role": "user", "content": generate_story_chapters_prompt(story_data)},
     ]
 
-    content, elapsed = validated_stream_llm(
+    content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=model,
+        model=settings.STAGE.CHAPTERS.MODEL,
+        temperature=settings.STAGE.CHAPTERS.TEMPERATURE,
+        max_tokens=settings.STAGE.CHAPTERS.MAX_TOKENS,
         validation_model=ChapterData,
     )
 

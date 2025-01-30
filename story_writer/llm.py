@@ -3,16 +3,18 @@ import logging
 import re
 import time
 from json import JSONDecodeError
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import pydantic
 from pydantic import BaseModel
 
+from story_writer import settings
 from story_writer.config.story_settings import (
     LLM_EMPTY_OUTPUT_RETRY_COUNT,
     LLM_INVALID_OUTPUT_RETRY_COUNT,
 )
-from story_writer.story_data_model import create_json_schema, StoryStructure
+from story_writer.models.base import StoryStructure
+from story_writer.models.utils import create_json_schema
 
 T = TypeVar("T", bound=BaseModel)
 SS = TypeVar("SS", bound=StoryStructure)
@@ -35,12 +37,9 @@ def replace_em_dash_with_regular_dash(inp: str) -> str:
     return re.sub("\u2013", "-", inp)
 
 
-def validated_stream_llm(
-    client,
-    messages,
-    model,
-    validation_model: type[T]
-) -> (type[Union[T, SS]] | list[type[T]], float):
+def get_validated_llm_output(
+    client, messages, model, validation_model: type[T], temperature: float, max_tokens: int
+) -> (type[T | SS] | list[type[T]], float):
     start = time.time()
     attempt = 0
     max_retries = LLM_INVALID_OUTPUT_RETRY_COUNT
@@ -50,6 +49,8 @@ def validated_stream_llm(
             messages=messages,
             model=model,
             response_format=create_json_schema(validation_model),
+            temperature=temperature,
+            max_tokens=max_tokens
         )
 
         try:
@@ -81,7 +82,7 @@ def validated_stream_llm(
     return valid_model, elapsed
 
 
-def stream_llm(client, messages, model, response_format: dict | None):
+def stream_llm(client, messages, model, response_format: dict | None, temperature: float, max_tokens: int):
     max_retries = LLM_EMPTY_OUTPUT_RETRY_COUNT
     retries = 0
 
@@ -94,11 +95,12 @@ def stream_llm(client, messages, model, response_format: dict | None):
     while retries < max_retries:
         response = client.chat.completions.create(
             messages=messages,
-            model=model,
+            model=model or settings.MODEL,
             response_format=response_format,
             stream=True,
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
-            temperature=0.85
+            temperature=temperature or settings.TEMPERATURE,
+            max_tokens=max_tokens or settings.MAX_TOKENS
         )
 
         output = ""

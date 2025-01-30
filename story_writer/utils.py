@@ -1,12 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import Type, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
 from story_writer.constants import StoryStructureEnum
-from story_writer.story_data_model import create_json_schema, STORY_STYLE_MODEL_MAPPING
+from story_writer.models.utils import create_json_schema, STORY_STYLE_MODEL_MAPPING
 
 if TYPE_CHECKING:
     from story_writer.story_data_model import StoryStructure
@@ -17,13 +17,13 @@ log = logging.getLogger(__name__)
 # TODO: Update settings such that it's passed into the llm call and logged.
 #  Settings might be anything beyond the absolute required inputs, like "stream" and "stream_options".
 def log_step(
-        story_root: Path,
-        file_name: str,
-        model: str,
-        messages: list,
-        settings: dict,
-        duration: float,
-        response_model: Type[BaseModel] | None = None,
+    story_root: Path,
+    file_name: str,
+    model: str,
+    messages: list,
+    settings: dict,
+    duration: float,
+    response_model: type[BaseModel] | None = None,
 ):
     """
     Generates logs per-outline in order to inspect the inputs and outputs of the LLM calls, per function.
@@ -73,7 +73,7 @@ def log_step(
 #     log.debug(f"Saved/Updated outline data for story: '{story_data.general.title}'")
 
 
-def get_story_structure_model(story_structure_enum: StoryStructureEnum) -> Type["StoryStructure"]:
+def get_story_structure_model(story_structure_enum: StoryStructureEnum) -> type["StoryStructure"]:
     if story_structure_enum not in STORY_STYLE_MODEL_MAPPING:
         raise ValueError(f"Invalid story structure provided: {story_structure_enum}")
 

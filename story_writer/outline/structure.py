@@ -2,12 +2,12 @@ from pathlib import Path
 
 from openai import Client
 
+from story_writer import utils, settings
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_structure_prompt
-from story_writer import utils
 from story_writer.constants import StoryStructureEnum
-from story_writer.llm import validated_stream_llm
-from story_writer.story_data_model import StoryData
+from story_writer.llm import get_validated_llm_output
+from story_writer.models.outline import StoryData
 from story_writer.utils import get_story_structure_model
 
 
@@ -41,11 +41,13 @@ def generate_story_structure(
     ]
 
     # Call to the LLM, should be able to trust the returned pydantic model.
-    story_structure_data, elapsed = validated_stream_llm(
+    story_structure_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=model,
+        model=settings.STAGE.STRUCTURE.MODEL,
         validation_model=story_structure_model,
+        temperature=settings.STAGE.STRUCTURE.TEMPERATURE,
+        max_tokens=settings.STAGE.STRUCTURE.MAX_TOKENS,
     )
 
     story_data.structure = story_structure_data
