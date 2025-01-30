@@ -1,6 +1,7 @@
 from story_writer.config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
 from story_writer.constants import StoryStructureEnum
-from story_writer.story_data_model import ChapterData, StoryData
+from story_writer.models.outline import StoryData
+from story_writer.models.outline_models import ChapterData
 
 GENERAL_SYSTEM_PROMPT = (
     "You are an experienced story author. You fill your story with world building and character "

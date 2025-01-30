@@ -4,10 +4,12 @@ from pathlib import Path
 
 import openai
 
+from story_writer import settings
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
-from story_writer.llm import validated_stream_llm
-from story_writer.story_data_model import GeneralData, StoryData
+from story_writer.llm import get_validated_llm_output
+from story_writer.models.outline import StoryData
+from story_writer.models.outline_models.general import GeneralData
 from story_writer.utils import log_step
 
 log = logging.getLogger(__name__)
@@ -23,18 +25,20 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     :return: Path to the directory containing the generated outline data
     """
     log.info("Generating Initial General Story Details (Title, Genres, Themes, and a Synopsis).")
-    model = FIRST_PASS_GENERATION_MODEL
     instructions = expand_user_input_prompt(user_prompt)
     messages = [
         {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
 
-    general_story_data, elapsed = validated_stream_llm(
+    general_story_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=model,
+        model=settings.STAGE.GENERAL.MODEL,
         validation_model=GeneralData,
+        temperature=settings.STAGE.GENERAL.TEMPERATURE,
+        max_tokens=settings.STAGE.GENERAL.MAX_TOKENS,
+
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/

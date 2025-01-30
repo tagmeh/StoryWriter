@@ -3,11 +3,13 @@ from pathlib import Path
 
 from openai import Client
 
+from story_writer import utils, settings
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_worldbuilding_prompt
-from story_writer import utils
-from story_writer.llm import validated_stream_llm
-from story_writer.story_data_model import StoryData, WorldbuildingData
+from story_writer.llm import get_validated_llm_output
+from story_writer.models.outline import StoryData
+from story_writer.models.outline_models import WorldbuildingData
+
 # from story_writer.utils import load_story_data, save_story_data
 
 log = logging.getLogger(__name__)
@@ -27,11 +29,13 @@ def generate_worldbuilding(client: Client, story_root: Path):
     ]
 
     # Todo: Potentially add a "Have enough characters" validator, if not, rerun validated_stream_llm
-    content, elapsed = validated_stream_llm(
+    content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=model,
+        model=settings.STAGE.WORLDBUILDING.MODEL,
+        temperature=settings.STAGE.WORLDBUILDING.TEMPERATURE,
         validation_model=WorldbuildingData,
+        max_tokens=settings.STAGE.WORLDBUILDING.MAX_TOKENS,
     )
 
     story_data.worldbuilding = content
