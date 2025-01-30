@@ -11,7 +11,6 @@ from openai import Client
 from pydantic import BaseModel
 
 from story_writer import settings
-
 from story_writer.models.base import StoryStructure
 from story_writer.models.utils import create_json_schema
 
@@ -37,8 +36,13 @@ def replace_em_dash_with_regular_dash(inp: str) -> str:
 
 
 def get_validated_llm_output(
-        client: Client, messages: list[dict[str, str]], model: str, validation_model: type[T], temperature: float,
-        max_tokens: int, stream: bool = True
+    client: Client,
+    messages: list[dict[str, str]],
+    model: str,
+    validation_model: type[T],
+    temperature: float,
+    max_tokens: int,
+    stream: bool = True,
 ) -> (type[T | SS] | list[type[T]], float):
     start = time.time()
     attempt = 0
@@ -60,7 +64,7 @@ def get_validated_llm_output(
                 model=model,
                 response_format=create_json_schema(validation_model),
                 temperature=temperature,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
             )
 
         try:
@@ -92,8 +96,14 @@ def get_validated_llm_output(
     return valid_model, elapsed
 
 
-def stream_llm(client: Client, messages: list[dict[str, str]], model: str, response_format: dict | None,
-               temperature: float, max_tokens: int):
+def stream_llm(
+    client: Client,
+    messages: list[dict[str, str]],
+    model: str,
+    response_format: dict | None,
+    temperature: float,
+    max_tokens: int,
+):
     """
     Streams the LLM response. Prints to the terminal as the output is captured.
 
@@ -124,7 +134,7 @@ def stream_llm(client: Client, messages: list[dict[str, str]], model: str, respo
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
             temperature=temperature or settings.LLM.temperature,
             max_tokens=max_tokens or settings.LLM.max_tokens,
-            reasoning_effort='high'  # Only useful for o1 models.
+            reasoning_effort="high",  # Only useful for o1 models.
         )
 
         output = ""
@@ -186,14 +196,16 @@ def call_llm(client, messages, model, response_format: dict | None, temperature:
             stream_options={"include_usage": True},
             temperature=temperature or settings.LLM.temperature,
             max_tokens=max_tokens or settings.LLM.max_tokens,
-            **settings.LLM.extra_fields
+            **settings.LLM.extra_fields,
         )
 
         output = response.choices[0].message.content
         log.debug(f"Output Length: {len(output)}")
-        log.debug(f"Usage: Prompt Tokens: {response.usage['prompt_tokens']} - "
-                  f"Completion Tokens: {response.usage['completion_tokens']} - "
-                  f"Total Tokens: {response.usage['total_tokens']}")
+        log.debug(
+            f"Usage: Prompt Tokens: {response.usage['prompt_tokens']} - "
+            f"Completion Tokens: {response.usage['completion_tokens']} - "
+            f"Total Tokens: {response.usage['total_tokens']}"
+        )
 
         log.debug("Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.")
         output = remove_directional_single_quotes(output)
@@ -226,6 +238,7 @@ def call_llm(client, messages, model, response_format: dict | None, temperature:
 
     else:
         log.error(f"Failed to get any data from the LLM in {retries} attempts.")
+
 
 # def call_llm(client, messages, model, response_format):
 #     start = time.time()

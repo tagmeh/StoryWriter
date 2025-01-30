@@ -14,9 +14,8 @@ class OverrideSettingsBase(BaseModel):
         extra = "allow"
 
     def model_post_init(self, __context: Any) -> None:
-        if hasattr(self, 'best_of') and hasattr(self, 'n'):
-            if self.best_of < self.n:
-                raise Exception(f"'best_of' ({self.best_of}) must be greater than 'n' ({self.n})")
+        if hasattr(self, "best_of") and hasattr(self, "n") and (self.best_of < self.n):
+            raise Exception(f"'best_of' ({self.best_of}) must be greater than 'n' ({self.n})")
 
 
 class StageOverrideSettings(OverrideSettingsBase):
@@ -31,6 +30,7 @@ class StageOverrideSettings(OverrideSettingsBase):
     Supported settings can be found here:
     https://github.com/openai/openai-python/blob/main/src/openai/types/completion_create_params.py
     """
+
     stream: bool | None = None
     max_tokens: int | None = None
     model: str | None = None
@@ -46,6 +46,7 @@ class OpenAiChatCompletionSettings(OverrideSettingsBase):
     Supported settings can be found here:
     https://github.com/openai/openai-python/blob/main/src/openai/types/completion_create_params.py
     """
+
     stream: bool = Field(default=False)
     max_tokens: int = Field(default=2048)
     model: str
@@ -64,7 +65,8 @@ class OutlineConfig(BaseModel):
 
 class Settings(BaseSettings):
     BASIC_SYSTEM_PROMPT: str = Field(
-        default="You are an experienced story author. You fill your story with world building and character defining details to fill out the story.")
+        default="You are an experienced story author. You fill your story with world building and character defining details to fill out the story."
+    )
     # URL to the LLM instance, local or remote.
     LLM_URL: str = Field(default="http://localhost:1234/v1")
     # API Key for LLM platform. Can also use a .env file with API_KEY
