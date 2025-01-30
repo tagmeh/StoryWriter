@@ -5,8 +5,7 @@ from pathlib import Path
 import openai
 
 from story_writer import settings
-from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import expand_user_input_prompt
+from story_writer.prompts import expand_user_input_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models.general import GeneralData
@@ -52,7 +51,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
         story_root=story_root,
         messages=messages,
         file_name="expand_initial_prompt",
-        model=FIRST_PASS_GENERATION_MODEL,
+        model=settings.LLM.model,
         settings={},
         response_model=GeneralData,
         duration=elapsed,

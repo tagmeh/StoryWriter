@@ -4,8 +4,7 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import generate_story_characters_prompt
+from story_writer.prompts import generate_story_characters_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import CharacterData
@@ -20,7 +19,7 @@ def generate_characters(client: Client, story_root: Path):
 
     log.info(f"Generating Characters for story: '{story_data.general.title}'")
 
-    model = FIRST_PASS_GENERATION_MODEL
+    model = settings.LLM.model
     instructions = generate_story_characters_prompt(story_data=story_data)
     messages = [
         {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},

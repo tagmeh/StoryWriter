@@ -3,8 +3,7 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import generate_story_structure_prompt
+from story_writer.prompts import generate_story_structure_prompt
 from story_writer.constants import StoryStructureEnum
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
@@ -32,7 +31,7 @@ def generate_story_structure(
     if not story_data.general:
         raise Exception("General story details do not exist, create a new story before generating the story structure.")
 
-    model = FIRST_PASS_GENERATION_MODEL
+    model = settings.LLM.model
     story_structure_model = get_story_structure_model(story_structure)
     instructions = generate_story_structure_prompt(story_structure, story_data)
     messages = [
