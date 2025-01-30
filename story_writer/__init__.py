@@ -1,8 +1,10 @@
 import logging
+from pathlib import Path
+
+import yaml
 
 from story_writer.config import models
-from story_writer.config import story_settings as ss
-from story_writer.story_config import StoryConfig
+from story_writer.story_config import Settings
 
 console_handler = logging.StreamHandler()
 # TODO: Add color to formatting? Tried "colorlog", doesn't seem to work for Windows. /shrug
@@ -15,18 +17,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("openai").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 
-settings_config = {
-    "STORY_STRUCTURE_STYLE": ss.STORY_STRUCTURE_STYLE,
-    "CHAPTER_MINIMUM_COUNT": ss.CHAPTER_MINIMUM_COUNT,
-    "SCENES_PER_CHAPTER_MINIMUM_COUNT": ss.SCENES_PER_CHAPTER_MINIMUM_COUNT,
-    "STAGE": ss.OUTLINE_STAGE_CONFIGS,
-    "SAVE_STORY_FILE_TYPE": ss.SAVE_STORY_FILE_TYPE,
-    "CONSOLIDATE_SAVED_OUTPUT": ss.CONSOLIDATE_SAVED_OUTPUT,
-    "SCENES_PER_CHAPTER_RETRY_COUNT": ss.SCENES_PER_CHAPTER_RETRY_COUNT,
-    "LLM_INVALID_OUTPUT_RETRY_COUNT": ss.LLM_INVALID_OUTPUT_RETRY_COUNT,
-    "LLM_EMPTY_OUTPUT_RETRY_COUNT": ss.LLM_INVALID_OUTPUT_RETRY_COUNT,
-    "MAX_TOKENS": ss.MAX_TOKENS,
-    "MODEL": models.FIRST_PASS_GENERATION_MODEL,
-}
+with open(Path(__file__).parents[1] / "config.yaml", 'r', encoding='utf-8') as f:
+    config = yaml.safe_load(f)
 
-settings = StoryConfig(**settings_config)
+settings = Settings(**config)
+
+if __name__ == '__main__':
+    from pprint import pprint
+    pprint(settings.model_dump(mode='python'))

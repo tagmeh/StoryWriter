@@ -1,6 +1,6 @@
 from openai import Client
 
-from story_writer.config.story_settings import STORY_STRUCTURE_STYLE
+from story_writer import settings
 from story_writer.outline.chapters import generate_chapters
 from story_writer.outline.characters import generate_characters
 from story_writer.outline.general import generate_general_story_details
@@ -67,7 +67,7 @@ def generate_story_outline(client: Client, prompt: str) -> None:
     story_root = generate_general_story_details(client, prompt.strip())
 
     # Uses the user-setting STORY_STRUCTURE_STYLE and story general data (above) to fill out the given story structure.
-    generate_story_structure(client, story_root, story_structure=STORY_STRUCTURE_STYLE)
+    generate_story_structure(client, story_root, story_structure=settings.STORY_STRUCTURE_STYLE)
 
     generate_worldbuilding(client, story_root)
 

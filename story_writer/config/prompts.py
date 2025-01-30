@@ -1,12 +1,7 @@
-from story_writer.config.story_settings import CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_MINIMUM_COUNT
+from story_writer import settings
 from story_writer.constants import StoryStructureEnum
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import ChapterData
-
-GENERAL_SYSTEM_PROMPT = (
-    "You are an experienced story author. You fill your story with world building and character "
-    "defining details to fill out the story."
-)
 
 
 def expand_user_input_prompt(user_input: str) -> str:
@@ -114,7 +109,7 @@ def generate_story_chapters_prompt(story_data: StoryData) -> str:
     :param story_data:
     :return:
     """
-    return f"""Define {CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
+    return f"""Define {settings.CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
 Use the Title, Genres, Themes, story synopsis, and story structure to generate chapters.
 
 Define the chapter title.
@@ -136,8 +131,8 @@ Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.li
 
 
 def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
-    return f"""Define {SCENES_PER_CHAPTER_MINIMUM_COUNT + 1} or more scenes for this chapter. Scenes should expand 
-on the chapter synopsis.
+    return f"""Define {settings.SCENES_PER_CHAPTER_MINIMUM_COUNT + 1} or more scenes for this chapter. Scenes should expand 
+on the chapter synopsis. Output response as JSON.
 
 Define a short summary of the scene.
 Define the characters and their statuses in the scene.

@@ -5,8 +5,7 @@ from openai import Client
 
 from story_writer import settings, utils
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_prompt
-from story_writer.config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT
+from story_writer.config.prompts import generate_story_chapter_scene_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import SceneData
@@ -40,7 +39,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
 
         log.info(f"Generating scenes for chapter {chapter.number}.")
         messages = [
-            {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
+            {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
             {
                 "role": "user",
                 "content": f"Characters: \n{character_seed_str}\nStory Structure/Outline: {story_structure_seed_str}",
@@ -51,23 +50,23 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             },
         ]
 
-        max_retries = SCENES_PER_CHAPTER_RETRY_COUNT
-        log.debug(f"Number of attempts to generate scenes: {SCENES_PER_CHAPTER_RETRY_COUNT}")
+        max_retries = settings.SCENES_PER_CHAPTER_RETRY_COUNT
+        log.debug(f"Number of attempts to generate scenes: {settings.SCENES_PER_CHAPTER_RETRY_COUNT}")
         attempts = 0
         while attempts < max_retries:
             log.debug(f"Attempt {attempts} at generating scenes for chapter {chapter.number}")
             content, elapsed = get_validated_llm_output(
                 client=client,
                 messages=messages,
-                model=settings.STAGE.SCENES.MODEL,
-                temperature=settings.STAGE.SCENES.TEMPERATURE,
-                max_tokens=settings.STAGE.SCENES.MAX_TOKENS,
+                model=settings.STAGE.SCENES.model,
+                temperature=settings.STAGE.SCENES.temperature,
+                max_tokens=settings.STAGE.SCENES.max_tokens,
                 validation_model=SceneData,
             )
 
-            if len(content) < SCENES_PER_CHAPTER_MINIMUM_COUNT:
+            if len(content) < settings.SCENES_PER_CHAPTER_MINIMUM_COUNT:
                 log.warning(
-                    f"LLM returned fewer than {SCENES_PER_CHAPTER_MINIMUM_COUNT} "
+                    f"LLM returned fewer than {settings.SCENES_PER_CHAPTER_MINIMUM_COUNT} "
                     f"scenes for chapter {chapter.number}. This is a user-setting. If the LLM model "
                     f"continues to fail, try updating the scene-generator prompt or lowering the minimum "
                     f"scenes per chapter in config/story_settings.py - SCENES_PER_CHAPTER_MINIMUM_COUNT. "
