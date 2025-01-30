@@ -1,4 +1,7 @@
 /.idea/
 
 /stories/**/
+/stories/prompt.txt
 /.ruff_cache/
+
+config.yaml
