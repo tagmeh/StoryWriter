@@ -3,8 +3,7 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import generate_story_chapters_prompt
+from story_writer.prompts import generate_story_chapters_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import ChapterData
@@ -17,7 +16,7 @@ def generate_chapters(client: Client, story_root: Path):
     for char_dict in [char.dict() for char in story_data.characters]:
         character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
-    model = FIRST_PASS_GENERATION_MODEL
+    model = settings.LLM.model
     messages = [
         {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
         {  # Seed data prior to chapter-generation instructions.

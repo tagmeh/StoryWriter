@@ -4,8 +4,7 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import generate_story_chapter_scene_prompt
+from story_writer.prompts import generate_story_chapter_scene_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import SceneData
@@ -26,8 +25,8 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
     # Generate a non-json string block to seed the context before each scene.
     character_seed_str = "".join([c.list_key_values_str() for c in story_data.characters])
 
-    model = FIRST_PASS_GENERATION_MODEL
-    log.debug(f"Generating Scenes using model: {FIRST_PASS_GENERATION_MODEL}")
+    model = settings.LLM.model
+    log.debug(f"Generating Scenes using model: {settings.LLM.model}")
     for chapter in story_data.chapters:
         story_structure_seed_str = (
             f"{story_data.structure.style}\n"
