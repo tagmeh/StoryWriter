@@ -3,7 +3,6 @@ from pathlib import Path
 
 import yaml
 
-from story_writer.config import models
 from story_writer.story_config import Settings
 
 console_handler = logging.StreamHandler()
@@ -17,11 +16,12 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("openai").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 
-with open(Path(__file__).parents[1] / "config.yaml", 'r', encoding='utf-8') as f:
+with open(Path(__file__).parents[1] / "config.yaml", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
 settings = Settings(**config)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pprint import pprint
-    pprint(settings.model_dump(mode='python'))
+
+    pprint(settings.model_dump(mode="python"))
