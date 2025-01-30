@@ -32,6 +32,7 @@ tqdm = "==4.67.1"
 typing-extensions = "==4.12.2"
 uc-micro-py = "==1.0.3"
 colorlog = "*"
+pydantic-settings = "*"
 
 [dev-packages]
 black = "*"

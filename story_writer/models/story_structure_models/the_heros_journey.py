@@ -9,7 +9,6 @@ from story_writer.models.validations import str_not_empty
 log = logging.getLogger(__name__)
 
 
-
 class TheHerosJourneyStoryStructure(StoryStructure):
     style: str = "The Hero's Journey"
     description: str = (

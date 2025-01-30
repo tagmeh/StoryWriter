@@ -42,6 +42,6 @@ LLM_INVALID_OUTPUT_RETRY_COUNT = 10
 LLM_EMPTY_OUTPUT_RETRY_COUNT = 10
 
 # Token Limit to apply to every LLM call. Overwritten by the OUTLINE_STAGE_CONFIGS stage "token_limit" setting.
-LLM_TOKEN_LIMIT = 2048
+MAX_TOKENS = 2048
 
 TEMPERATURE = 0.95

@@ -38,7 +38,6 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
         validation_model=GeneralData,
         temperature=settings.STAGE.GENERAL.TEMPERATURE,
         max_tokens=settings.STAGE.GENERAL.MAX_TOKENS,
-
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/
