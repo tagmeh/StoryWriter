@@ -1,0 +1,30 @@
+# Rename this file to "config.yaml" before running.
+
+# Minimum required setting:
+story_prompt: "Create a story about a person bitten b"
+LLM:
+  model: "<Your Model Name here"
+  # ====================================================================================================================
+  # ================================EVERYTHING BELOW THIS POINT IS OPTIONAL=============================================
+  # ====================================================================================================================
+#  max_tokens: 2048  # Default. Used to adjust max_tokens for every LLM call. Overridden by below STAGES section.
+
+# Configured for LM Studio by default.
+# Update the LLM_URL to "http://localhost:11434/v1" for Ollama, "http://localhost:1337/v1" for Jan (May not support all required features, specifically Structured Output)
+#LLM_URL: ""
+# OpenAI package will extract this value, named the same, from an .env file, if that makes you more comfortable.
+#API_KEY: ""
+
+# Story generation goes through multiple stages to create the outline before creating the full story.
+# To edit LLM parameters per-stage:
+#STAGES:
+#  GENERAL:
+#    max_tokens: 1024  # Default is 2048, but for the General outline stage, the max_tokens is 1024.
+#    model: "something else"  # Change which model you use for each stage.
+#    temperature: 0.5  # Adjust how creative the model is for this stage.
+#  CHARACTERS:
+#    max_tokens: -1  # Disables the max_tokens limiter. Be careful, some models (o1) will output forever.
+#    best_of: 3
+#    n: 1
+#    # Not explicitly listed in the settings model, but will be passed to the OpenAI Chat Completions call as a kwarg.
+#    echo: true  # This setting conflicts with the outline process, which uses strict structured output to more easily format the responses into pydantic models.

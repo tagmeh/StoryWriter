@@ -6,7 +6,7 @@ import openai
 
 from story_writer import settings
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, expand_user_input_prompt
+from story_writer.config.prompts import expand_user_input_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models.general import GeneralData
@@ -27,17 +27,17 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     log.info("Generating Initial General Story Details (Title, Genres, Themes, and a Synopsis).")
     instructions = expand_user_input_prompt(user_prompt)
     messages = [
-        {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
+        {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
 
     general_story_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.GENERAL.MODEL,
+        model=settings.STAGE.GENERAL.model,
         validation_model=GeneralData,
-        temperature=settings.STAGE.GENERAL.TEMPERATURE,
-        max_tokens=settings.STAGE.GENERAL.MAX_TOKENS,
+        temperature=settings.STAGE.GENERAL.temperature,
+        max_tokens=settings.STAGE.GENERAL.max_tokens,
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/

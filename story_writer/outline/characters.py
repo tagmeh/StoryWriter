@@ -5,7 +5,7 @@ from openai import Client
 
 from story_writer import settings, utils
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_characters_prompt
+from story_writer.config.prompts import generate_story_characters_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import CharacterData
@@ -23,7 +23,7 @@ def generate_characters(client: Client, story_root: Path):
     model = FIRST_PASS_GENERATION_MODEL
     instructions = generate_story_characters_prompt(story_data=story_data)
     messages = [
-        {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
+        {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
 
@@ -31,14 +31,12 @@ def generate_characters(client: Client, story_root: Path):
     content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.CHARACTERS.MODEL,
-        temperature=settings.STAGE.CHARACTERS.TEMPERATURE,
-        max_tokens=settings.STAGE.CHARACTERS.MAX_TOKENS,
+        model=settings.STAGE.CHARACTERS.model,
+        temperature=settings.STAGE.CHARACTERS.temperature,
+        max_tokens=settings.STAGE.CHARACTERS.max_tokens,
         validation_model=CharacterData,
     )
 
-    print(f"{content=}")
-    print(f"{type(content)=}")
     story_data.characters = content
 
     # save_story_data(story_root, story_data)

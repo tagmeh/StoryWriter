@@ -4,7 +4,7 @@ from openai import Client
 
 from story_writer import settings, utils
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
-from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_structure_prompt
+from story_writer.config.prompts import generate_story_structure_prompt
 from story_writer.constants import StoryStructureEnum
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
@@ -36,7 +36,7 @@ def generate_story_structure(
     story_structure_model = get_story_structure_model(story_structure)
     instructions = generate_story_structure_prompt(story_structure, story_data)
     messages = [
-        {"role": "system", "content": GENERAL_SYSTEM_PROMPT},
+        {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
         {"role": "user", "content": instructions},
     ]
 
@@ -44,10 +44,10 @@ def generate_story_structure(
     story_structure_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.STRUCTURE.MODEL,
+        model=settings.STAGE.STRUCTURE.model,
         validation_model=story_structure_model,
-        temperature=settings.STAGE.STRUCTURE.TEMPERATURE,
-        max_tokens=settings.STAGE.STRUCTURE.MAX_TOKENS,
+        temperature=settings.STAGE.STRUCTURE.temperature,
+        max_tokens=settings.STAGE.STRUCTURE.max_tokens,
     )
 
     story_data.structure = story_structure_data
