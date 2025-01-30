@@ -7,7 +7,6 @@ from pydantic import AfterValidator, BaseModel
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.validations import str_not_empty
 
-
 log = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BaseModel)

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openai import Client
 
-from story_writer import utils, settings
+from story_writer import settings, utils
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_worldbuilding_prompt
 from story_writer.llm import get_validated_llm_output

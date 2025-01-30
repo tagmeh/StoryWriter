@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openai import Client
 
-from story_writer import utils, settings
+from story_writer import settings, utils
 from story_writer.config.models import FIRST_PASS_GENERATION_MODEL
 from story_writer.config.prompts import GENERAL_SYSTEM_PROMPT, generate_story_chapter_scene_prompt
 from story_writer.config.story_settings import SCENES_PER_CHAPTER_MINIMUM_COUNT, SCENES_PER_CHAPTER_RETRY_COUNT

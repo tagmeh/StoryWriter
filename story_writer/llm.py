@@ -50,7 +50,7 @@ def get_validated_llm_output(
             model=model,
             response_format=create_json_schema(validation_model),
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
         try:
@@ -100,7 +100,7 @@ def stream_llm(client, messages, model, response_format: dict | None, temperatur
             stream=True,
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
             temperature=temperature or settings.TEMPERATURE,
-            max_tokens=max_tokens or settings.MAX_TOKENS
+            max_tokens=max_tokens or settings.MAX_TOKENS,
         )
 
         output = ""

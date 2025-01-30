@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 
 from story_writer.config import models
 from story_writer.constants import StorySaveFormatEnum, StoryStructureEnum
@@ -27,7 +28,7 @@ class OutlineConfig(BaseModel):
     SCENES: OutlineStageConfig
 
 
-class StoryConfig(BaseModel):
+class StoryConfig(BaseSettings):
     STORY_STRUCTURE_STYLE: StoryStructureEnum = Field(default=StoryStructureEnum.SEVEN_POINT)
     CHAPTER_MINIMUM_COUNT: int = Field(default=5, gt=-1)
     SCENES_PER_CHAPTER_MINIMUM_COUNT: int = Field(default=3)
