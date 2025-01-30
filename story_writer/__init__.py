@@ -20,8 +20,3 @@ with open(Path(__file__).parents[1] / "config.yaml", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
 settings = Settings(**config)
-
-if __name__ == "__main__":
-    from pprint import pprint
-
-    pprint(settings.model_dump(mode="python"))
