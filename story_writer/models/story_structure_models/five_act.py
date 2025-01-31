@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from pydantic import AfterValidator, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import StoryStructure
 from story_writer.models.validations import str_not_empty
@@ -10,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class FiveActStructure(StoryStructure):
-    style: str = "Five Act Structure"
-    description: str = "Basically the same as Freytag's Pyramid, but without the expectation of it being a tragedy."
+    style: SkipJsonSchema[str] = "Five Act Structure"
+    description: SkipJsonSchema[str] = "Basically the same as Freytag's Pyramid, but without the expectation of it being a tragedy."
     exposition: Annotated[
         str,
         AfterValidator(str_not_empty),

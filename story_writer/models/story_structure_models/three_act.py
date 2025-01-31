@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from pydantic import AfterValidator, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import StoryStructure
 from story_writer.models.validations import str_not_empty
@@ -10,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class ThreeActStructure(StoryStructure):
-    style: str = "Three Act Structure"
-    description: str = (
+    style: SkipJsonSchema[str] = "Three Act Structure"
+    description: SkipJsonSchema[str] = (
         "Traditional outline structure, most structures follow a variation on this one. Very popular in movies"
     )
     act_1_exposition: Annotated[str, AfterValidator(str_not_empty), Field(description="Establish the status quo.")]

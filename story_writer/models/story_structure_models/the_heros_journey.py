@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from pydantic import AfterValidator, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import StoryStructure
 from story_writer.models.validations import str_not_empty
@@ -10,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class TheHerosJourneyStoryStructure(StoryStructure):
-    style: str = "The Hero's Journey"
-    description: str = (
+    style: SkipJsonSchema[str] = "The Hero's Journey"
+    description: SkipJsonSchema[str] = (
         "Campbell’s original structure uses terminology that lends itself well to epic tales of bravery and triumph."
     )
     the_ordinary_world: Annotated[

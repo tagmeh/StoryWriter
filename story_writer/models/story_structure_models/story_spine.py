@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from pydantic import AfterValidator, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import StoryStructure
 from story_writer.models.validations import str_not_empty
@@ -10,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class StorySpine(StoryStructure):
-    style: str = "Story Spine"
-    description: str = ""
+    style: SkipJsonSchema[str] = "Story Spine"
+    description: SkipJsonSchema[str] = ""
     once_upon_a_time: Annotated[
         str, AfterValidator(str_not_empty), Field(description="Setup protagonist and the starting situation.")
     ]
