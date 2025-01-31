@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
@@ -10,12 +10,10 @@ log = logging.getLogger(__name__)
 
 
 class OverrideSettingsBase(BaseModel):
+    """Holds validations for the two similar settings classes."""
+
     class Config:
         extra = "allow"
-
-    def model_post_init(self, __context: Any) -> None:
-        if hasattr(self, "best_of") and hasattr(self, "n") and (self.best_of < self.n):
-            raise Exception(f"'best_of' ({self.best_of}) must be greater than 'n' ({self.n})")
 
 
 class StageOverrideSettings(OverrideSettingsBase):
@@ -48,7 +46,9 @@ class OpenAiChatCompletionSettings(OverrideSettingsBase):
     """
 
     model: str
-    reasoning_effort: Literal['low', 'medium', 'high'] = Field(default="medium", description="Lower reasoning means faster results.")
+    reasoning_effort: Literal["low", "medium", "high"] = Field(
+        default="medium", description="Lower reasoning means faster results."
+    )
     modalities: list[str] = ["text"]  # This project does not support audio yet.
     stream: bool = Field(default=False)
     max_tokens: int = Field(default=2048)

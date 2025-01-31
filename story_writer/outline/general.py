@@ -5,10 +5,10 @@ from pathlib import Path
 import openai
 
 from story_writer import settings
-from story_writer.prompts import expand_user_input_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models.general import GeneralData
+from story_writer.prompts import expand_user_input_prompt
 from story_writer.utils import log_step
 
 log = logging.getLogger(__name__)
@@ -31,10 +31,7 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     ]
 
     general_story_data, elapsed = get_validated_llm_output(
-        client=client,
-        messages=messages,
-        validation_model=GeneralData,
-        model_settings=settings.STAGE.GENERAL
+        client=client, messages=messages, validation_model=GeneralData, model_settings=settings.STAGE.GENERAL
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/

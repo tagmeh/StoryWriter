@@ -3,10 +3,10 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.prompts import generate_story_structure_prompt
 from story_writer.constants import StoryStructureEnum
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
+from story_writer.prompts import generate_story_structure_prompt
 from story_writer.utils import get_story_structure_model
 
 
@@ -44,7 +44,7 @@ def generate_story_structure(
         client=client,
         messages=messages,
         validation_model=story_structure_model,
-        model_settings=settings.STAGE.STRUCTURE
+        model_settings=settings.STAGE.STRUCTURE,
     )
 
     story_data.structure = story_structure_data

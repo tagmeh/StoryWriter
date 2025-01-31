@@ -32,7 +32,7 @@ def generate_worldbuilding(client: Client, story_root: Path):
         client=client,
         messages=messages,
         validation_model=WorldbuildingData,
-        model_settings=settings.STAGE.WORLDBUILDING
+        model_settings=settings.STAGE.WORLDBUILDING,
     )
 
     story_data.worldbuilding = content
