@@ -4,10 +4,10 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.prompts import generate_story_chapter_scene_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import SceneData
+from story_writer.prompts import generate_story_chapter_scene_prompt
 
 # from story_writer.utils import load_story_data, save_story_data
 
@@ -55,10 +55,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
         while attempts < max_retries:
             log.debug(f"Attempt {attempts} at generating scenes for chapter {chapter.number}")
             content, elapsed = get_validated_llm_output(
-                client=client,
-                messages=messages,
-                validation_model=SceneData,
-                model_settings=settings.STAGE.SCENES
+                client=client, messages=messages, validation_model=SceneData, model_settings=settings.STAGE.SCENES
             )
 
             if len(content) < settings.SCENES_PER_CHAPTER_MINIMUM_COUNT:

@@ -3,7 +3,6 @@ import logging
 import re
 import time
 from json import JSONDecodeError
-from pprint import pprint
 from typing import TypeVar
 
 import pydantic
@@ -40,14 +39,14 @@ def get_validated_llm_output(
     client: Client,
     messages: list[dict[str, str]],
     validation_model: type[T],
-    model_settings: StageOverrideSettings | None = None
+    model_settings: StageOverrideSettings | None = None,
 ) -> (type[T | SS] | list[type[T]], float):
 
     # Get the default settings.
-    llm_settings: dict = settings.LLM.model_dump(mode='python')
+    llm_settings: dict = settings.LLM.model_dump(mode="python")
     # Update default settings with stage-specific settings.
     if model_settings:
-        llm_settings.update(model_settings.model_dump(mode='python', exclude_unset=True))
+        llm_settings.update(model_settings.model_dump(mode="python", exclude_unset=True))
 
     start = time.time()
     attempt = 0
@@ -58,7 +57,7 @@ def get_validated_llm_output(
             client=client,
             messages=messages,
             response_format=create_json_schema(validation_model),
-            llm_settings=llm_settings
+            llm_settings=llm_settings,
         )
 
         try:
@@ -90,12 +89,7 @@ def get_validated_llm_output(
     return valid_model, elapsed
 
 
-def call_llm(
-    client: Client,
-    messages: list[dict[str, str]],
-    response_format: dict | None,
-    llm_settings: dict
-):
+def call_llm(client: Client, messages: list[dict[str, str]], response_format: dict | None, llm_settings: dict):
     """
     Calls the LLM. If stream=True (set using user-accessible via config.yaml), the output is streamed to the terminal.
 
@@ -119,7 +113,7 @@ def call_llm(
             messages=messages,
             response_format=response_format,
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
-            **llm_settings
+            **llm_settings,
         )
 
         if isinstance(response, Stream):

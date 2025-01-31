@@ -3,10 +3,10 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.prompts import generate_story_chapters_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import ChapterData
+from story_writer.prompts import generate_story_chapters_prompt
 
 
 def generate_chapters(client: Client, story_root: Path):
@@ -27,10 +27,7 @@ def generate_chapters(client: Client, story_root: Path):
     ]
 
     content, elapsed = get_validated_llm_output(
-        client=client,
-        messages=messages,
-        validation_model=ChapterData,
-        model_settings=settings.STAGE.CHAPTERS
+        client=client, messages=messages, validation_model=ChapterData, model_settings=settings.STAGE.CHAPTERS
     )
 
     for count, chapter in enumerate(content):
