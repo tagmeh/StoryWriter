@@ -15,6 +15,9 @@ CBM = TypeVar("CBM", bound="CustomBaseModel")
 
 class SceneCharacterdata(CustomBaseModel):
     name: Annotated[str, AfterValidator(str_not_empty)]
+    # Todo: Consider adding a description or field to try and keep the name field clean.
+    #  Can get values like "Alice (some other nonense)"
+    #  Can also get statuses that just explain what the character is doing or feeling.
     status: Annotated[str, AfterValidator(str_not_empty)]
 
 

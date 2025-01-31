@@ -69,7 +69,8 @@ class OutlineConfig(BaseModel):
 
 class Settings(BaseSettings):
     BASIC_SYSTEM_PROMPT: str = Field(
-        default="You are an experienced story author. You fill your story with world building and character defining details to fill out the story."
+        default="You are an experienced story author. You fill your story "
+        "with worldbuilding and character defining details to fill out the story."
     )
     # URL to the LLM instance, local or remote.
     LLM_URL: str = Field(default="http://localhost:1234/v1")
@@ -101,14 +102,3 @@ class Settings(BaseSettings):
 
     class Config:
         extra = "ignore"
-
-
-"""
-Future settings
-
-
-
-
-
-
-"""
