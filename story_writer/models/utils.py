@@ -37,7 +37,8 @@ STORY_STYLE_MODEL_MAPPING = {
 
 
 def create_json_schema(model: type[BaseModel]) -> dict[str, Any] | None:
-    if model.__name__ in ["CharacterData", "ChapterData", "SceneData"]:
+    array_models = ["CharacterData", "ChapterData", "SceneData"]
+    if model.__name__ in array_models:
         schema = TypeAdapter(list[model]).json_schema()
     else:
         schema = model.model_json_schema()

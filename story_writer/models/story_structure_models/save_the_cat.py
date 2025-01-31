@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from pydantic import AfterValidator, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import StoryStructure
 from story_writer.models.validations import str_not_empty
@@ -10,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class SaveTheCatStructure(StoryStructure):
-    style: str = "Save the Cat"
-    description: str = "A more detailed version of the three act structure."
+    style: SkipJsonSchema[str] = "Save the Cat"
+    description: SkipJsonSchema[str] = "A more detailed version of the three act structure."
     opening_image: Annotated[
         str,
         AfterValidator(str_not_empty),

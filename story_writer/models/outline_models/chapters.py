@@ -5,6 +5,7 @@ from typing import Annotated, Literal, TypeVar
 
 import yaml
 from pydantic import AfterValidator
+from pydantic.json_schema import SkipJsonSchema
 
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.outline_models.scenes import SceneData
@@ -22,12 +23,14 @@ class ChapterCharacterData(CustomBaseModel):
 
 class ChapterData(CustomBaseModel):
     title: Annotated[str, AfterValidator(str_not_empty)]
-    number: int | None = None  # This is added manually. LLMs don't always count in order.
+    # Overwritten after the chapters are created. LLMs don't always count in order.
+    # Left here to discourage title names with the chapter number in them. eg "Chapter Two: Camelot"
+    number: int
     story_structure_point: Annotated[str, AfterValidator(str_not_empty)]
     location: Annotated[str, AfterValidator(str_not_empty)]
     characters: list[ChapterCharacterData]
     synopsis: Annotated[str, AfterValidator(str_not_empty)]
-    scenes: list[SceneData] = []
+    scenes: SkipJsonSchema[list[SceneData]] = []
 
     def save_to_file(self, output_dir: Path, file_type: Literal["json", "yaml"], filename: str = None):
         """
