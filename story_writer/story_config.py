@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
@@ -28,7 +28,7 @@ class StageOverrideSettings(OverrideSettingsBase):
             temperature: 1.0
             max_tokens: 100
     Supported settings can be found here:
-    https://github.com/openai/openai-python/blob/main/src/openai/types/completion_create_params.py
+    https://platform.openai.com/docs/api-reference/chat
     """
 
     stream: bool | None = None
@@ -44,14 +44,18 @@ class OpenAiChatCompletionSettings(OverrideSettingsBase):
     Allows extra params for edge case support. Update the config.yaml under
     "LLM" to add additional supported properties.
     Supported settings can be found here:
-    https://github.com/openai/openai-python/blob/main/src/openai/types/completion_create_params.py
+    https://platform.openai.com/docs/api-reference/chat
     """
 
+    model: str
+    reasoning_effort: Literal['low', 'medium', 'high'] = Field(default="medium", description="Lower reasoning means faster results.")
+    modalities: list[str] = ["text"]  # This project does not support audio yet.
     stream: bool = Field(default=False)
     max_tokens: int = Field(default=2048)
-    model: str
-    temperature: float = Field(default=0.95, gt=0, le=1.0)
-    frequency_penalty: float = Field(default=1.3, ge=-2.0, le=2.0)
+    temperature: float = Field(default=0.95, gt=0, le=2.0)
+    top_p: float = Field(default=1.0)
+    presence_penalty: float = Field(default=1.0, ge=-2.0, le=2.0)
+    n: int | None = Field(default=1, ge=1, description="Number of chat completions to create per call.")
 
 
 class OutlineConfig(BaseModel):
@@ -94,6 +98,9 @@ class Settings(BaseSettings):
     STAGE: OutlineConfig = OutlineConfig()
     # Default LLM Settings if not provided a per-STAGE setting to override it.
     LLM: OpenAiChatCompletionSettings
+
+    class Config:
+        extra = "ignore"
 
 
 """

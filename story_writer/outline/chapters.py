@@ -29,10 +29,8 @@ def generate_chapters(client: Client, story_root: Path):
     content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.CHAPTERS.model,
-        temperature=settings.STAGE.CHAPTERS.temperature,
-        max_tokens=settings.STAGE.CHAPTERS.max_tokens,
         validation_model=ChapterData,
+        model_settings=settings.STAGE.CHAPTERS
     )
 
     for count, chapter in enumerate(content):
