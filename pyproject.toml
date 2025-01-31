@@ -1,3 +1,29 @@
+[project]
+name = "StoryWriter"
+description = "A script to utilize openai-like LLM platforms (local and remote) to create fictional stories."
+readme = "README.md"
+version = "2025.0.1"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+dependencies = [
+    "openai~=1.60.1",
+    "textual~=1.0.0",
+    "pydantic~=2.10.6",
+    "PyYAML~=6.0.2",
+    "pydantic-settings~=2.7.1"
+]
+requires-python = ">= 3.10"
+
+[project.urls]
+Homepage = "https://github.com/tagmeh/StoryWriter"
+
+[project.scripts]
+generate = "main"
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
 [tool.black]
 line_length = 120
 
@@ -6,7 +32,7 @@ python_version = "3.10"
 disallow_untyped_defs = true
 ignore_missing_imports = true
 strict = true
-exclude = ["tests", "build", "dist", "itential.py.egg-info"]
+exclude = ["tests", "docs", "stories"]
 plugins = ['pydantic.mypy']
 
 [tool.coverage.run]

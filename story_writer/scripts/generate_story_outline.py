@@ -59,7 +59,7 @@ def generate_story_outline(client: Client, prompt: str) -> None:
         Location
         Story Beats (What happens in the scene, should generally follow the chapter's synopsis)
 
-    :return: Each section saves it's data in a StoryData object, which is "cached"
+    :return: Each section saves its data in a StoryData object, which is "cached"
              as a file in /stories/<story title>/story_data.(json|yaml)
     """
 
