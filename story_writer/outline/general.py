@@ -33,10 +33,8 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
     general_story_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.GENERAL.model,
         validation_model=GeneralData,
-        temperature=settings.STAGE.GENERAL.temperature,
-        max_tokens=settings.STAGE.GENERAL.max_tokens,
+        model_settings=settings.STAGE.GENERAL
     )
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/

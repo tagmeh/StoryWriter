@@ -9,6 +9,8 @@ LLM:
   # ====================================================================================================================
 #  max_tokens: 2048  # Default. Used to adjust max_tokens for every LLM call. Overridden by below STAGES section.
 
+log_level: "info"
+
 # Configured for LM Studio by default.
 # Update the LLM_URL to "http://localhost:11434/v1" for Ollama, "http://localhost:1337/v1" for Jan (May not support all required features, specifically Structured Output)
 #LLM_URL: ""

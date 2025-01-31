@@ -4,10 +4,10 @@ from pathlib import Path
 from openai import Client
 
 from story_writer import settings, utils
-from story_writer.prompts import generate_worldbuilding_prompt
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import WorldbuildingData
+from story_writer.prompts import generate_worldbuilding_prompt
 
 # from story_writer.utils import load_story_data, save_story_data
 
@@ -31,10 +31,8 @@ def generate_worldbuilding(client: Client, story_root: Path):
     content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.WORLDBUILDING.model,
-        temperature=settings.STAGE.WORLDBUILDING.temperature,
         validation_model=WorldbuildingData,
-        max_tokens=settings.STAGE.WORLDBUILDING.max_tokens,
+        model_settings=settings.STAGE.WORLDBUILDING
     )
 
     story_data.worldbuilding = content

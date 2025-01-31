@@ -43,10 +43,8 @@ def generate_story_structure(
     story_structure_data, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.STRUCTURE.model,
         validation_model=story_structure_model,
-        temperature=settings.STAGE.STRUCTURE.temperature,
-        max_tokens=settings.STAGE.STRUCTURE.max_tokens,
+        model_settings=settings.STAGE.STRUCTURE
     )
 
     story_data.structure = story_structure_data

@@ -30,10 +30,8 @@ def generate_characters(client: Client, story_root: Path):
     content, elapsed = get_validated_llm_output(
         client=client,
         messages=messages,
-        model=settings.STAGE.CHARACTERS.model,
-        temperature=settings.STAGE.CHARACTERS.temperature,
-        max_tokens=settings.STAGE.CHARACTERS.max_tokens,
         validation_model=CharacterData,
+        model_settings=settings.STAGE.CHARACTERS
     )
 
     story_data.characters = content

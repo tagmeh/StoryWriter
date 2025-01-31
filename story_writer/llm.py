@@ -7,12 +7,13 @@ from pprint import pprint
 from typing import TypeVar
 
 import pydantic
-from openai import Client
+from openai import Client, Stream
 from pydantic import BaseModel
 
 from story_writer import settings
 from story_writer.models.base import StoryStructure
 from story_writer.models.utils import create_json_schema
+from story_writer.story_config import StageOverrideSettings
 
 T = TypeVar("T", bound=BaseModel)
 SS = TypeVar("SS", bound=StoryStructure)
@@ -38,34 +39,27 @@ def replace_em_dash_with_regular_dash(inp: str) -> str:
 def get_validated_llm_output(
     client: Client,
     messages: list[dict[str, str]],
-    model: str,
     validation_model: type[T],
-    temperature: float,
-    max_tokens: int,
-    stream: bool = True,
+    model_settings: StageOverrideSettings | None = None
 ) -> (type[T | SS] | list[type[T]], float):
+
+    # Get the default settings.
+    llm_settings: dict = settings.LLM.model_dump(mode='python')
+    # Update default settings with stage-specific settings.
+    if model_settings:
+        llm_settings.update(model_settings.model_dump(mode='python', exclude_unset=True))
+
     start = time.time()
     attempt = 0
     max_retries = settings.LLM_INVALID_OUTPUT_RETRY_COUNT
+
     while attempt < max_retries:
-        if stream:
-            content = stream_llm(
-                client=client,
-                messages=messages,
-                model=model,
-                response_format=create_json_schema(validation_model),
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
-        else:
-            content = call_llm(
-                client=client,
-                messages=messages,
-                model=model,
-                response_format=create_json_schema(validation_model),
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
+        content = call_llm(
+            client=client,
+            messages=messages,
+            response_format=create_json_schema(validation_model),
+            llm_settings=llm_settings
+        )
 
         try:
             if isinstance(content, dict):
@@ -89,32 +83,26 @@ def get_validated_llm_output(
         log.error(f"Failed to get valid story data in {max_retries} attempts.")
         raise Exception(
             f"Failed to get valid general story data in {max_retries} attempts. "
-            f"The model '{model}' may not be suitable for this task. "
+            f"The model '{llm_settings['model']}' may not be suitable for this task. "
             f"Try another model that supports structured outputs."
         )
     elapsed = time.time() - start
     return valid_model, elapsed
 
 
-def stream_llm(
+def call_llm(
     client: Client,
     messages: list[dict[str, str]],
-    model: str,
     response_format: dict | None,
-    temperature: float,
-    max_tokens: int,
+    llm_settings: dict
 ):
     """
-    Streams the LLM response. Prints to the terminal as the output is captured.
+    Calls the LLM. If stream=True (set using user-accessible via config.yaml), the output is streamed to the terminal.
 
     :param client: OpenAI Client object. Used to make calls to the LLM.
     :param messages: Array of {"role": "system|user", "content": "to LLM str"}
-    :param model: str - String name of the model to use. Platform specific.
     :param response_format: Optional[dict] json schema for the LLM to output using. Requires platform/model to support
                             "Structured Output"
-    :param temperature:
-    :param max_tokens:
-    :return:
     """
     max_retries = settings.LLM_EMPTY_OUTPUT_RETRY_COUNT
     retries = 0
@@ -125,87 +113,32 @@ def stream_llm(
 
     log.debug(f"Structured Output Object: \n{json.dumps(response_format)}")
 
+    log.debug(f"Calling LLM with settings: {llm_settings}")
     while retries < max_retries:
         response = client.chat.completions.create(
             messages=messages,
-            model=model or settings.LLM.model,
             response_format=response_format,
-            stream=True,
             stream_options={"include_usage": True},  # Doesn't work for LM Studio?
-            temperature=temperature or settings.LLM.temperature,
-            max_tokens=max_tokens or settings.LLM.max_tokens,
-            reasoning_effort="high",  # Only useful for o1 models.
+            **llm_settings
         )
 
-        output = ""
-        for chunk in response:
-            if chunk.choices:  # Last response chunk may not have choices, resulting in an IndexError.
-                print(chunk.choices[0].delta.content or "", end="")
-                output += chunk.choices[0].delta.content or ""
-        print("")  # Prevents the next print statement from being on the same line as the last chunk.
-        log.debug(f"Output Length: {len(output)}")
-        log.debug("Usage: Unavailable when streaming output.")
-
-        log.debug("Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.")
-        output = remove_directional_single_quotes(output)
-        output = remove_end_of_line_indicators(output)
-        output = replace_em_dash_with_regular_dash(output)
-        output = output.strip()  # Reduces output that's all spaces and tabs into an empty string for validation.
-
-        if response_format:  # Expectation is that the output will always be an object. Per structured output specs.
-            log.debug("LLM called with a response schema, output will be ran through a json serializer.")
-            try:
-                content = json.loads(output)
-                log.debug("Serialized LLM output successfully")
-            except JSONDecodeError as err:
-                log.error(f'JSONDecodeError: "{err}". Attempts: {retries}, Retrying...')
-                retries += 1
-                continue
-
-        else:  # Output is a string because there was no structured output/response format.
-            log.debug("LLM called without a response schema, output is raw.")
-            # Todo: Check to see if the openai package will return an integer if the LLM output is "1" or similar.
-            content = output  # Without a response_format, output is expected to just be a string.
-
-        if content == {} or content == [] or content == "":
-            log.error(f'No content returned from LLM. "{content}". Attempts: {retries}, Retrying...')
-            retries += 1
-
+        if isinstance(response, Stream):
+            output = ""
+            for chunk in response:
+                if chunk.choices:  # Last response chunk may not have choices, resulting in an IndexError.
+                    print(chunk.choices[0].delta.content or "", end="")
+                    output += chunk.choices[0].delta.content or ""
+            print("")  # Prevents the next print statement from being on the same line as the last chunk.
+            log.debug(f"Output Length: {len(output)}")
+            log.debug("Usage: Unavailable when streaming output.")
         else:
-            return content
-
-    else:
-        log.error(f"Failed to get any data from the LLM in {retries} attempts.")
-
-
-def call_llm(client, messages, model, response_format: dict | None, temperature: float, max_tokens: int):
-    max_retries = settings.LLM_EMPTY_OUTPUT_RETRY_COUNT
-    retries = 0
-    # Output the message contents for use in testing manually.
-    for count, message in enumerate(messages):
-        log.debug(f"Message: {count} - Role: {message['role']} - Content: \n{message['content']}")
-
-    log.debug(f"Structured Output Object: \n{json.dumps(response_format)}")
-
-    while retries < max_retries:
-        response = client.chat.completions.create(
-            messages=messages,
-            model=model or settings.LLM.model,
-            response_format=response_format,
-            stream=False,
-            stream_options={"include_usage": True},
-            temperature=temperature or settings.LLM.temperature,
-            max_tokens=max_tokens or settings.LLM.max_tokens,
-            **settings.LLM.extra_fields,
-        )
-
-        output = response.choices[0].message.content
-        log.debug(f"Output Length: {len(output)}")
-        log.debug(
-            f"Usage: Prompt Tokens: {response.usage['prompt_tokens']} - "
-            f"Completion Tokens: {response.usage['completion_tokens']} - "
-            f"Total Tokens: {response.usage['total_tokens']}"
-        )
+            output = response.choices[0].message.content
+            log.debug(f"Output Length: {len(output)}")
+            log.debug(
+                f"Usage: Prompt Tokens: {response.usage.prompt_tokens} - "
+                f"Completion Tokens: {response.usage.completion_tokens} - "
+                f"Total Tokens: {response.usage.total_tokens}"
+            )
 
         log.debug("Processing LLM string output. Removing non-utf-8 characters and other LLM oddities.")
         output = remove_directional_single_quotes(output)
@@ -217,7 +150,6 @@ def call_llm(client, messages, model, response_format: dict | None, temperature:
             log.debug("LLM called with a response schema, output will be ran through a json serializer.")
             try:
                 content = json.loads(output)
-                pprint(content)
                 log.debug("Serialized LLM output successfully")
             except JSONDecodeError as err:
                 log.error(f'JSONDecodeError: "{err}". Attempts: {retries}, Retrying...')

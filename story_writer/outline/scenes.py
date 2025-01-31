@@ -57,10 +57,8 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             content, elapsed = get_validated_llm_output(
                 client=client,
                 messages=messages,
-                model=settings.STAGE.SCENES.model,
-                temperature=settings.STAGE.SCENES.temperature,
-                max_tokens=settings.STAGE.SCENES.max_tokens,
                 validation_model=SceneData,
+                model_settings=settings.STAGE.SCENES
             )
 
             if len(content) < settings.SCENES_PER_CHAPTER_MINIMUM_COUNT:
