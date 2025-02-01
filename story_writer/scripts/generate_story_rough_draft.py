@@ -69,4 +69,27 @@ def generate_story_rough_draft(client: Client, title: str):
             story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
             """
 
+            """
+            instructions = 
+            SYSTEM PROMPT < Already added >
+            
+            GENRE
+            THEMES
+            
+            CHAPTER #
+            CHAPTER SYNOPOSIS
+            
+            RELEVANT STORY STRUCTURE
+            <Name>: <Description>
+            <Name>: <Description>
+            
+            SCENE #
+            CHARACTERS BY NAME
+            LOCATION
+            STORY BEATS
+            lorem ipsum paragraph, join lists, print strings.
+            
+            
+            """
+
         ...
