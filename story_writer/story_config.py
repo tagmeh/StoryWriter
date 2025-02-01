@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
-from story_writer.constants import StorySaveFormatEnum, StoryStructureEnum
+from story_writer.constants import StoryStructureEnum
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class Settings(BaseSettings):
     # Minimum number of scenes required for each chapter.
     SCENES_PER_CHAPTER_MINIMUM_COUNT: int = Field(default=3, ge=1)
     # File format that the story_data (or the separate files) are saved as.
-    SAVE_STORY_FILE_TYPE: StorySaveFormatEnum = Field(default=StorySaveFormatEnum.JSON)
+    SAVE_STORY_FILE_TYPE: Literal["json", "yaml"] = "yaml"
     # True: Saves all outline data into one story_data.json|yaml file.
     # False: Saves each outline component in separate files. Chapters/Scenes are saved in directories.
     CONSOLIDATE_SAVED_OUTPUT: bool = Field(default=True)

@@ -25,7 +25,6 @@ def generate_story_structure(
     :return: None (Saves parameters used in the LLM call in the story directory /logs/,
              updates the story_data.yaml with the structured return data.)
     """
-    # story_data: StoryData = load_story_data(story_path=story_root)
     story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
 
     if not story_data.general:
