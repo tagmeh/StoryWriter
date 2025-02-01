@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel, TypeAdapter
 
 from story_writer.constants import StoryStructureEnum
-from story_writer.models.story_structure_models import (
+from story_writer.models.outline_models.story_structure_models import (
     ClassicStoryStructure,
     DanHarmonsStoryCircleStructure,
     FichteanCurveStructure,

@@ -1,10 +1,11 @@
 import logging
 from pathlib import Path
-from typing import Literal, TypeVar
+from typing import TypeVar
 
+from story_writer import settings
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.outline_models import ChapterData, CharacterData, GeneralData, WorldbuildingData
-from story_writer.models.story_structure_models import (
+from story_writer.models.outline_models.story_structure_models import (
     ClassicStoryStructure,
     DanHarmonsStoryCircleStructure,
     FichteanCurveStructure,
@@ -46,32 +47,31 @@ class StoryData(CustomBaseModel):
     def __str__(self):
         return f"{self.general.title}"
 
-    def save_to_file(
-        self, output_dir: Path, file_type: Literal["json", "yaml"] = "yaml", one_file: bool = True, filename: str = None
-    ):
+    def save_to_file(self, output_dir: Path, filename: str = None):
+        print(f"{output_dir=}")
+        if settings.CONSOLIDATE_SAVED_OUTPUT:
+            log.debug("Saving story outline data as one consolidated file.")
+            super().save_to_file(output_dir=output_dir, filename="story_data")
+        else:
+            super().save_to_file(output_dir=output_dir, filename="story_data")
+            log.debug("Saving story outline data as a series of files in relevant folders.")
 
-        # if one_file:
-        super().save_to_file(output_dir=output_dir, filename="story_data")
+            # Save each property separately (dicts as files, lists as files within a directory)
+            for key, value in self.model_dump(mode="python").items():
+                if value is None:
+                    continue  # Prevents creating empty files/folders
 
-        # else:
-        #     # Save each property separately (dicts as files, lists as files within a directory)
-        #     for key, value in self.model_dump(mode="python").items():
-        #         if value is None:
-        #             continue  # Prevents creating empty files/folders
-        #
-        #         if isinstance(value, list):
-        #             # Create the subdirectory for the list of x
-        #             list_dir = story_dir / key
-        #             list_dir.mkdir(exist_ok=True)
-        #             print(f"{value=}")
-        #             for character in self.__getattribute__(key):
-        #                 print(f"{character=}")
-        #                 character.save_to_file(output_dir=list_dir, file_type=file_type)
-        #
-        #         elif isinstance(value, dict):
-        #             self.__getattribute__(key).save_to_file(
-        #                 output_dir=story_dir, file_type=file_type, filename=f"{key}"
-        #             )
+                if isinstance(value, list):
+                    # Create the subdirectory for the list of x
+                    list_dir = output_dir / key
+                    list_dir.mkdir(exist_ok=True)
+                    print(f"{value=}")
+                    for character in self.__getattribute__(key):
+                        print(f"{character=}")
+                        character.save_to_file(output_dir=list_dir)
+
+                elif isinstance(value, dict):
+                    self.__getattribute__(key).save_to_file(output_dir=output_dir, filename=key)
 
     # TODO: The load feature needs to do one of two things:
     #  1) Try to load the data both ways (consolidated/Not consolidated) because the style of saving can change between stories.
