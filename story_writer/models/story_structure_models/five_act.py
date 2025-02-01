@@ -12,7 +12,9 @@ log = logging.getLogger(__name__)
 
 class FiveActStructure(StoryStructure):
     style: SkipJsonSchema[str] = "Five Act Structure"
-    description: SkipJsonSchema[str] = "Basically the same as Freytag's Pyramid, but without the expectation of it being a tragedy."
+    description: SkipJsonSchema[str] = (
+        "Basically the same as Freytag's Pyramid, but without the expectation of it being a tragedy."
+    )
     exposition: Annotated[
         str,
         AfterValidator(str_not_empty),

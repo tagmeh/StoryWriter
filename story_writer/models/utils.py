@@ -22,10 +22,10 @@ log = logging.getLogger(__name__)
 
 
 STORY_STYLE_MODEL_MAPPING = {
-    StoryStructureEnum.CLASSIC: ClassicStoryStructure,
+    StoryStructureEnum.CLASSIC_STORY_STRUCTURE: ClassicStoryStructure,
     StoryStructureEnum.THREE_ACT_STRUCTURE: ThreeActStructure,
     StoryStructureEnum.FIVE_ACT_STRUCTURE: FiveActStructure,
-    StoryStructureEnum.SEVEN_POINT: SevenPointStoryStructure,
+    StoryStructureEnum.SEVEN_POINT_STORY_STRUCTURE: SevenPointStoryStructure,
     StoryStructureEnum.FREYTAGS_PYRAMID: FreytagsPyramidStoryStructure,
     StoryStructureEnum.THE_HEROS_JOURNEY: TheHerosJourneyStoryStructure,
     StoryStructureEnum.DAN_HARMONS_STORY_CIRCLE: DanHarmonsStoryCircleStructure,

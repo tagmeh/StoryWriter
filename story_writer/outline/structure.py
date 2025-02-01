@@ -13,7 +13,7 @@ from story_writer.utils import get_story_structure_model
 def generate_story_structure(
     client: Client,
     story_root: Path,
-    story_structure: StoryStructureEnum = StoryStructureEnum.CLASSIC,
+    story_structure: StoryStructureEnum = StoryStructureEnum.CLASSIC_STORY_STRUCTURE,
 ):
     """
     Uses the LLM to generate the story structure based on the user's selected story structure.

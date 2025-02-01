@@ -77,7 +77,7 @@ class Settings(BaseSettings):
     # API Key for LLM platform. Can also use a .env file with API_KEY
     API_KEY: str = Field(default="LM Studio")
     # The type of outline/structure generated to help keep the outline on track.
-    STORY_STRUCTURE_STYLE: StoryStructureEnum = Field(default=StoryStructureEnum.SEVEN_POINT)
+    STORY_STRUCTURE_STYLE: StoryStructureEnum = Field(default=StoryStructureEnum.SEVEN_POINT_STORY_STRUCTURE)
     # Minimum required chapters for the outline.
     CHAPTER_MINIMUM_COUNT: int = Field(default=5, ge=1)
     # Minimum number of scenes required for each chapter.
