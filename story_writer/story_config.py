@@ -13,7 +13,7 @@ class OverrideSettingsBase(BaseModel):
     """Holds validations for the two similar settings classes."""
 
     class Config:
-        extra = "allow"
+        extra = "allow"  # Required to allow users to use undefined settings that are supported by the OpenAI package.
 
 
 class StageOverrideSettings(OverrideSettingsBase):

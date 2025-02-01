@@ -13,6 +13,7 @@ CBM = TypeVar("CBM", bound="CustomBaseModel")
 
 
 class CharacterData(CustomBaseModel):
+    # Todo: Add a uuid field to better, or more programmatically reference the character
     name: Annotated[str, AfterValidator(str_not_empty)]
     age: Annotated[str, AfterValidator(str_not_empty)]
     role: Annotated[str, AfterValidator(str_not_empty)]

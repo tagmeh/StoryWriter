@@ -14,9 +14,10 @@ CBM = TypeVar("CBM", bound="CustomBaseModel")
 
 
 class SceneCharacterdata(CustomBaseModel):
+    # Todo: Identify a better way to capture chapter/scene char data to relate it to the generated characters.
     name: Annotated[str, AfterValidator(str_not_empty)]
     # Todo: Consider adding a description or field to try and keep the name field clean.
-    #  Can get values like "Alice (some other nonense)"
+    #  Can get values like "Alice (some other nonsense)"
     #  Can also get statuses that just explain what the character is doing or feeling.
     status: Annotated[str, AfterValidator(str_not_empty)]
 
@@ -29,5 +30,5 @@ class SceneData(CustomBaseModel):
     misc: str | None = None
     story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
 
-    def save_to_file(self, output_dir: Path, file_type: Literal["json", "yaml"], filename: str = None):
-        super().save_to_file(output_dir=output_dir, file_type=file_type, filename=filename)
+    def save_to_file(self, output_dir: Path, filename: str = None):
+        super().save_to_file(output_dir=output_dir, filename=filename)

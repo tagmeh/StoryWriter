@@ -70,7 +70,6 @@ ignore_errors = true
 fail_under = 60
 
 [tool.coverage.html]
-include = ["story_writer/**"]
 directory = "coverage_html_report"
 
 [tool.pytest.ini_options]
