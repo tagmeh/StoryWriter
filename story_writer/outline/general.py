@@ -36,7 +36,6 @@ def generate_general_story_details(client: openai.Client, user_prompt) -> Path |
 
     project_root = Path(__file__).parents[2]  # ../StoryWriter/
     story_root = Path(f"{project_root}/stories/{datetime.now().timestamp() * 1000:.0f} - {general_story_data.title}")
-    story_root.mkdir(parents=True, exist_ok=True)
 
     story_data = StoryData(general=general_story_data)  # Initial StoryData creation.
 

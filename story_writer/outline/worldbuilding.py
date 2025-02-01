@@ -9,13 +9,11 @@ from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import WorldbuildingData
 from story_writer.prompts import generate_worldbuilding_prompt
 
-# from story_writer.utils import load_story_data, save_story_data
 
 log = logging.getLogger(__name__)
 
 
 def generate_worldbuilding(client: Client, story_root: Path):
-    # story_data: StoryData = load_story_data(story_path=story_root)
     story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
 
     log.info(f"Generating Characters for story: '{story_data.general.title}'")
@@ -37,7 +35,6 @@ def generate_worldbuilding(client: Client, story_root: Path):
 
     story_data.worldbuilding = content
 
-    # save_story_data(story_root, story_data)
     story_data.save_to_file(output_dir=story_root)
 
     # Todo: Update the log_step function. Figure out what it's purpose is.

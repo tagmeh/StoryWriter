@@ -1,10 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import Literal, TypeVar
+from typing import TypeVar
 
 import yaml
 from pydantic import BaseModel
+
+from story_writer import settings
 
 log = logging.getLogger(__name__)
 
@@ -34,32 +36,50 @@ class CustomBaseModel(BaseModel):
                 output += f" {key}: {value}\n"
         return output
 
-    def save_to_file(self, output_dir: Path, file_type: str, filename: str = None):
+    def save_to_file(self, output_dir: Path, filename: str = None):
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        file_path = output_dir / (f"{filename}.{file_type}" or f"{self.__class__.__name__}.{file_type}")
-
+        file_path = output_dir / (
+            f"{filename}.{settings.SAVE_STORY_FILE_TYPE}"
+            or f"{self.__class__.__name__}.{settings.SAVE_STORY_FILE_TYPE}"
+        )
+        log.debug(f"Saving/Updating outline data to {file_path}")
         try:
-            if file_type == "json":
+            if settings.SAVE_STORY_FILE_TYPE == "json":
                 with open(file_path, mode="w+", encoding="utf-8") as f:
                     json.dump(self.model_dump(mode="json"), f, indent=4)
-            elif file_type == "yaml":
+
+            elif settings.SAVE_STORY_FILE_TYPE == "yaml":
                 with open(file_path, mode="w+", encoding="utf-8") as f:
                     yaml.dump(self.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
+
         except Exception as err:
             log.error(f"Unable to save file '{file_path}' due to error: {err}")
             raise
 
     @classmethod
-    def load_from_file(cls: type[CBM], file_type: Literal["json", "yaml"], file_path: Path) -> CBM:
-        if file_type == "json":
-            with open(file_path, encoding="utf-8") as f:
-                data = json.load(f)
-        elif file_type == "yaml":
-            with open(file_path, encoding="utf-8") as f:
-                data = yaml.safe_load(f)
-        else:
-            raise Exception(f"File type: '{file_type}' not supported.")
+    def load_from_file(cls: type[CBM], story_dir: Path, filename: str) -> CBM:
+        """
+        Loads the data from a single file.
+        :param story_dir: Path to story root directory
+        :param filename: filename of the saved file.
+        :return:
+        """
+        file_path = story_dir / f"{filename}.{settings.SAVE_STORY_FILE_TYPE}"
+        log.debug(f"Loading outline data from '{file_path}'")
+
+        try:
+            if settings.SAVE_STORY_FILE_TYPE == "json":
+                with open(file_path, encoding="utf-8") as f:
+                    data = json.load(f)
+
+            elif settings.SAVE_STORY_FILE_TYPE == "yaml":
+                with open(file_path, encoding="utf-8") as f:
+                    data = yaml.safe_load(f)
+
+        except Exception as err:
+            log.error(f"Failed to load story data due to error: {err}")
+            raise
 
         return cls(**data)
 

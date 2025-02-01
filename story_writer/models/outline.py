@@ -1,9 +1,6 @@
-import json
 import logging
 from pathlib import Path
 from typing import Literal, TypeVar
-
-import yaml
 
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.outline_models import ChapterData, CharacterData, GeneralData, WorldbuildingData
@@ -52,33 +49,9 @@ class StoryData(CustomBaseModel):
     def save_to_file(
         self, output_dir: Path, file_type: Literal["json", "yaml"] = "yaml", one_file: bool = True, filename: str = None
     ):
-        """
-        Saves the StoryData output depending on a couple of settings.
-        :param output_dir: Should be /stories/
-        :param file_type: json or yaml, based on user setting.
-        :param filename: None
-        :param one_file: bool - If True, saves the StoryData data as one file: "story_data.*" Otherwise, save files separately
-        :return:
-        """
-        # story_dir = output_dir / self.general.title
-        story_dir = output_dir
-        story_dir.mkdir(parents=True, exist_ok=True)
 
         # if one_file:
-        # Save the data into one file as either a json or yaml file.
-        story_data_path = story_dir / f"story_data.{file_type}"
-        log.debug(f"Saving/Updating outline data to {story_data_path}")
-
-        if file_type == "yaml":
-            with open(story_data_path, mode="w+", encoding="utf-8") as f:
-                yaml.dump(self.model_dump(mode="python"), f, default_flow_style=False, sort_keys=False)
-
-        elif file_type == "json":
-            with open(story_data_path, mode="w+", encoding="utf-8") as f:
-                json.dump(self.model_dump(mode="json"), f, indent=4, sort_keys=False)
-
-        else:
-            log.error(f"Failed to save story data, save type is invalid: {file_type}")
+        super().save_to_file(output_dir=output_dir, filename="story_data")
 
         # else:
         #     # Save each property separately (dicts as files, lists as files within a directory)
@@ -104,22 +77,9 @@ class StoryData(CustomBaseModel):
     #  1) Try to load the data both ways (consolidated/Not consolidated) because the style of saving can change between stories.
     #  2) Save a settings.json or similar for each story, then reference that to determine style of saving, file_type, ect.
     @classmethod
-    def load_from_file(
-        cls: type[CBM], saved_dir: Path, file_type: Literal["json", "yaml"] = "yaml", one_file: bool = True
-    ) -> "StoryData":
+    def load_from_file(cls: type[CBM], saved_dir: Path, one_file: bool = True):
         # if one_file:
-        story_data_path = saved_dir / f"story_data.{file_type}"
-        log.debug(f"Loading outline data from '{story_data_path}'")
-
-        if file_type == "yaml":
-            with open(story_data_path, encoding="utf-8") as f:
-                return StoryData(**yaml.safe_load(f))
-
-        elif file_type == "json":
-            with open(story_data_path, encoding="utf-8") as f:
-                return StoryData(**json.load(fp=f))
-        else:
-            log.error(f"Failed to load story data, save type is invalid: {file_type}")
+        return super().load_from_file(story_dir=saved_dir, filename="story_data")
 
         # else:
         #     story_data = {}

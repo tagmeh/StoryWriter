@@ -28,19 +28,3 @@ class StoryStructureEnum(Enum):
         raise ValueError(
             f"'{value}' is not a supported Story Structure Type. Use one of: {', '.join([ss.value for ss in StoryStructureEnum])}"
         )
-
-
-class StorySaveFormatEnum(Enum):
-    JSON = "json"
-    YAML = "yaml"
-
-    @classmethod
-    def _missing_(cls, value: str) -> "StorySaveFormatEnum":
-        """Accepts a string and attempts to return the matching StorySaveFormatEnum object."""
-        normalized_value = value.strip().lower()
-        for val in StorySaveFormatEnum:
-            if val.value.strip().lower() == normalized_value:
-                return val
-        raise ValueError(
-            f"'{value}' is not a supported Save Format. Use one of: {', '.join([ss.value for ss in StorySaveFormatEnum])}"
-        )

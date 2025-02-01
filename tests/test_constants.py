@@ -1,23 +1,6 @@
 import unittest
 
-from story_writer.constants import StorySaveFormatEnum, StoryStructureEnum
-
-
-class TestStorySaveFormatEnum(unittest.TestCase):
-
-    def test_config_input_success(self):
-        # Value from config (set by user)
-        value = "YAML"
-        result = StorySaveFormatEnum(value)
-
-        self.assertIsInstance(result, StorySaveFormatEnum)
-        self.assertEqual(result.value, "yaml")
-
-    def test_config_input_failure(self):
-        # Value from config (set by user)
-        value = "mp4"
-        with self.assertRaises(ValueError):
-            StorySaveFormatEnum(value)
+from story_writer.constants import StoryStructureEnum
 
 
 class TestStoryStructureEnum(unittest.TestCase):

@@ -9,7 +9,6 @@ from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import SceneData
 from story_writer.prompts import generate_story_chapter_scene_prompt
 
-# from story_writer.utils import load_story_data, save_story_data
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +17,6 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
     """
     For each chapter, generate a few scenes based on the chapter synopsis, location, and characters.
     """
-    # story_data: StoryData = load_story_data(story_path=story_root)
     story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
     log.debug(f"Generating Scenes for outline: {story_data.general.title}")
 
@@ -80,7 +78,6 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
 
         chapter.scenes = content
 
-        # save_story_data(story_root, story_data)
         story_data.save_to_file(output_dir=story_root)
 
         utils.log_step(
