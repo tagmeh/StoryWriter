@@ -48,7 +48,7 @@ class StoryData(CustomBaseModel):
         return f"{self.general.title}"
 
     def save_to_file(self, output_dir: Path, filename: str = None):
-        print(f"{output_dir=}")
+        """ output_dir is the path to the story directory /stories/<story>/"""
         if settings.CONSOLIDATE_SAVED_OUTPUT:
             log.debug("Saving story outline data as one consolidated file.")
             super().save_to_file(output_dir=output_dir, filename="story_data")

@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Annotated, TypeVar
 
-from pydantic import AfterValidator
+from pydantic import AfterValidator, Field
 
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.validations import str_not_empty
@@ -15,7 +15,7 @@ CBM = TypeVar("CBM", bound="CustomBaseModel")
 class CharacterData(CustomBaseModel):
     # Todo: Add a uuid field to better, or more programmatically reference the character
     name: Annotated[str, AfterValidator(str_not_empty)]
-    age: Annotated[str, AfterValidator(str_not_empty)]
+    age: int
     role: Annotated[str, AfterValidator(str_not_empty)]
     description: Annotated[str, AfterValidator(str_not_empty)]
     personality: Annotated[str, AfterValidator(str_not_empty)]

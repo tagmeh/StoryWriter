@@ -27,7 +27,6 @@ class SceneData(CustomBaseModel):
     number: int | None = None  # This is added manually. LLMs don't always count in order.
     characters: list[SceneCharacterdata]
     location: Annotated[str, AfterValidator(str_not_empty)]
-    misc: str | None = None
     story_beats: list[Annotated[str, AfterValidator(str_not_empty)]]
 
     def save_to_file(self, output_dir: Path, filename: str = None):
