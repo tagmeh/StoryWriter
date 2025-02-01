@@ -3,8 +3,8 @@ name = "StoryWriter"
 description = "A script to utilize openai-like LLM platforms (local and remote) to create fictional stories."
 readme = "README.md"
 version = "2025.0.1"
-license = "MIT"
-license-files = ["LICENSE.txt"]
+# license = "MIT"
+# license-files = ["LICENSE.txt"]
 dependencies = [
     "openai~=1.60.1",
     "textual~=1.0.0",
@@ -25,7 +25,7 @@ dev = [
 Homepage = "https://github.com/tagmeh/StoryWriter"
 
 [project.scripts]
-generate = "main"
+generate = "story_writer.main:cli"
 
 [build-system]
 requires = ["setuptools >= 61.0"]
