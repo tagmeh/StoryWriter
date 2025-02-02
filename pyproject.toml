@@ -23,8 +23,7 @@ dev = [
 Homepage = "https://github.com/tagmeh/StoryWriter"
 
 [project.scripts]
-story-writer = "story_writer.main:tui"
-swcli = "story_writer.main:cli"
+swcli = "story_writer.cli:cli"
 
 [build-system]
 requires = ["setuptools >= 61.0"]

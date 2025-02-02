@@ -1,15 +1,4 @@
-from openai import OpenAI
-
-from story_writer.scripts.generate_story_outline import generate_story_outline
-
-
-def cli():
-    client = OpenAI(base_url="http://127.0.0.1:1234/v1", api_key="lm studio")
-
-    with open("stories/prompt.txt", encoding="utf-8") as f:
-        prompt = f.read()
-
-    generate_story_outline(client, prompt.strip())
+from story_writer.cli import cli
 
 
 if __name__ == "__main__":

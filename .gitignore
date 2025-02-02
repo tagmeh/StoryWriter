@@ -7,3 +7,5 @@
 
 config.yaml
 /.coverage
+
+__pycache__
