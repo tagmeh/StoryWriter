@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Annotated, Literal, TypeVar
+from typing import Annotated, TypeVar
 
 import yaml
 from pydantic import AfterValidator
@@ -40,30 +40,31 @@ class ChapterData(CustomBaseModel):
         :param filename:
         :return: None, creates a /Chapter-n/ directory and saves the chapter and scenes within that dir.
         """
+        log.info(f"Saving Chapter {self.number}, including {len(self.scenes)} scenes.")
         chapter_dir = output_dir / f"Chapter-{self.number}"
         chapter_dir.mkdir(exist_ok=True)
         super().save_to_file(output_dir=chapter_dir, filename=f"chapter-{self.number}")
 
         if self.scenes:
             for scene in self.scenes:
-                scene.save_to_file(output_dir=chapter_dir, filename=f"scene-{self.number}")
+                scene.save_to_file(output_dir=chapter_dir, filename=f"scene-{scene.number}")
 
     @classmethod
     def load_from_file(cls: type[CBM], file_path: Path) -> CBM:
         # Load chapter data
         print(f"chapter file path {file_path=}")
-        chapter_file = file_path / f"chapter-{file_path.name.split('-')[-1]}.{settings.SAVE_STORY_FILE_TYPE}"
-        if settings.SAVE_STORY_FILE_TYPE == "json":
+        chapter_file = file_path / f"chapter-{file_path.name.split('-')[-1]}.{settings.save_story_file_type}"
+        if settings.save_story_file_type == "json":
             with open(chapter_file, encoding="utf-8") as f:
                 chapter_data = json.load(f)
-        elif settings.SAVE_STORY_FILE_TYPE == "yaml":
+        elif settings.save_story_file_type == "yaml":
             with open(chapter_file, encoding="utf-8") as f:
                 chapter_data = yaml.safe_load(f)
         else:
-            raise Exception(f"File type: '{settings.SAVE_STORY_FILE_TYPE}' not supported.")
+            raise Exception(f"File type: '{settings.save_story_file_type}' not supported.")
 
         scenes = []
-        for scene_path in sorted(file_path.glob(f"scene-*.{settings.SAVE_STORY_FILE_TYPE}")):
+        for scene_path in sorted(file_path.glob(f"scene-*.{settings.save_story_file_type}")):
             print(f"{scene_path=}")
             scenes.append(SceneData.load_from_file(story_dir=scene_path))
 

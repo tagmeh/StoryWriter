@@ -1,7 +1,9 @@
-from openai import OpenAI
 import argparse
 
+from openai import OpenAI
+
 from story_writer.scripts.generate_story_outline import generate_story_outline
+from story_writer.scripts.generate_story_rough_draft import generate_story_rough_draft
 
 
 def cli():
@@ -21,3 +23,4 @@ def cli():
         prompt = f.read()
 
     generate_story_outline(client, prompt.strip())
+    generate_story_rough_draft(client)

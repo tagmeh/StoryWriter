@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -21,8 +22,8 @@ class StageOverrideSettings(OverrideSettingsBase):
     Override settings for each stage in the outline process.
     Update the config.yaml for each stage to override.
         ex:
-        STAGE:
-          GENERAL:
+        stage:
+          general:
             temperature: 1.0
             max_tokens: 100
     Supported settings can be found here:
@@ -34,13 +35,16 @@ class StageOverrideSettings(OverrideSettingsBase):
     model: str | None = None
     temperature: float | None = None
     frequency_penalty: float | None = None
+    # User Defined Settings that I didn't explicitly set
+    # OpenAI supports more settings than I have set, and
+    # I don't need to recreate their stuff.
 
 
-class OpenAiChatCompletionSettings(OverrideSettingsBase):
+class OpenAiChatDefaultSettings(OverrideSettingsBase):
     """
     Default OpenAI Completions.create() parameters. Passed into the function as kwargs directly.
     Allows extra params for edge case support. Update the config.yaml under
-    "LLM" to add additional supported properties.
+    "llm" to add additional supported properties.
     Supported settings can be found here:
     https://platform.openai.com/docs/api-reference/chat
     """
@@ -59,46 +63,55 @@ class OpenAiChatCompletionSettings(OverrideSettingsBase):
 
 
 class OutlineConfig(BaseModel):
-    GENERAL: StageOverrideSettings = StageOverrideSettings()
-    STRUCTURE: StageOverrideSettings = StageOverrideSettings()
-    CHARACTERS: StageOverrideSettings = StageOverrideSettings()
-    WORLDBUILDING: StageOverrideSettings = StageOverrideSettings()
-    CHAPTERS: StageOverrideSettings = StageOverrideSettings()
-    SCENES: StageOverrideSettings = StageOverrideSettings()
+    general: StageOverrideSettings = StageOverrideSettings()
+    structure: StageOverrideSettings = StageOverrideSettings()
+    characters: StageOverrideSettings = StageOverrideSettings()
+    worldbuilding: StageOverrideSettings = StageOverrideSettings()
+    chapters: StageOverrideSettings = StageOverrideSettings()
+    scenes: StageOverrideSettings = StageOverrideSettings()
+
+
+class StoryStats(BaseModel):
+    scene_count: int
+    character_count: int
+    chapter_count: int
+    word_count: int
 
 
 class Settings(BaseSettings):
-    BASIC_SYSTEM_PROMPT: str = Field(
+    story_dir: Path | None = None
+    basic_system_prompt: str = Field(
         default="You are an experienced story author. You fill your story "
         "with worldbuilding and character defining details to fill out the story."
     )
     # URL to the LLM instance, local or remote.
-    LLM_URL: str = Field(default="http://localhost:1234/v1")
+    llm_url: str = Field(default="http://localhost:1234/v1")
     # API Key for LLM platform. Can also use a .env file with API_KEY
-    API_KEY: str = Field(default="LM Studio")
+    api_key: str = Field(default="LM Studio")
     # The type of outline/structure generated to help keep the outline on track.
-    STORY_STRUCTURE_STYLE: StoryStructureEnum = Field(default=StoryStructureEnum.SEVEN_POINT_STORY_STRUCTURE)
+    story_structure_style: StoryStructureEnum = Field(default=StoryStructureEnum.SEVEN_POINT_STORY_STRUCTURE)
     # Minimum required chapters for the outline.
-    CHAPTER_MINIMUM_COUNT: int = Field(default=5, ge=1)
+    chapter_minimum_count: int = Field(default=5, ge=1)
     # Minimum number of scenes required for each chapter.
-    SCENES_PER_CHAPTER_MINIMUM_COUNT: int = Field(default=3, ge=1)
+    scenes_per_chapter_minimum_count: int = Field(default=3, ge=1)
     # File format that the story_data (or the separate files) are saved as.
-    SAVE_STORY_FILE_TYPE: Literal["json", "yaml"] = "yaml"
+    save_story_file_type: Literal["json", "yaml"] = "yaml"
     # True: Saves all outline data into one story_data.json|yaml file.
     # False: Saves each outline component in separate files. Chapters/Scenes are saved in directories.
-    CONSOLIDATE_SAVED_OUTPUT: bool = Field(default=True)
+    consolidate_saved_output: bool = Field(default=True)
     # Number of retries to generate the scenes data. This section has proven to be particularly finicky.
     #  Will retry if the generated scenes are fewer than SCENES_PER_CHAPTER_MINIMUM_COUNT.
-    SCENES_PER_CHAPTER_RETRY_COUNT: int = Field(default=30, gt=0)
+    scenes_per_chapter_retry_count: int = Field(default=30, gt=0)
     # Number of times to retry the chat completion upon pydantic model validation failure.
-    LLM_INVALID_OUTPUT_RETRY_COUNT: int = Field(default=10, gt=0)
+    llm_invalid_output_retry_count: int = Field(default=10, gt=0)
     # Number of times to retry the chat completion upon receiving an empty output or bad json data (
     #   if validating a structured output against a pydantic model.).
-    LLM_EMPTY_OUTPUT_RETRY_COUNT: int = Field(default=10, gt=0)
+    llm_empty_output_retry_count: int = Field(default=10, gt=0)
     # Per-outline-stage settings.
-    STAGE: OutlineConfig = OutlineConfig()
+    stage: OutlineConfig = OutlineConfig()
     # Default LLM Settings if not provided a per-STAGE setting to override it.
-    LLM: OpenAiChatCompletionSettings
+    llm: OpenAiChatDefaultSettings
+    draft: StageOverrideSettings = StageOverrideSettings()
 
     class Config:
         extra = "ignore"

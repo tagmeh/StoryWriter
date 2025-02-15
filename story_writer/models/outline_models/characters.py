@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Annotated, TypeVar
 
-from pydantic import AfterValidator, Field
+from pydantic import AfterValidator
 
 from story_writer.models.base import CustomBaseModel
 from story_writer.models.validations import str_not_empty

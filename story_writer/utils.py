@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel
 
 from story_writer.constants import StoryStructureEnum
-
 from story_writer.models.utils import STORY_STYLE_MODEL_MAPPING, create_json_schema
 
 if TYPE_CHECKING:

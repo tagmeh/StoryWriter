@@ -32,31 +32,37 @@ def remove_end_of_line_indicators(inp: str) -> str:
 
 def replace_em_dash_with_regular_dash(inp: str) -> str:
     """Replaces the infamous em dash with a regular god-fearing dash."""
-    return re.sub("\u2013", "-", inp)
+    return re.sub("(\u2014|\u2013)", "-", inp)
+
+
+def process_out_non_utf8(inp: str) -> str:
+    """encode() then decode() the string to remove non-utf-8 unicode characters."""
+    return inp.encode("utf-8", "ignore").decode()
 
 
 def get_validated_llm_output(
     client: Client,
     messages: list[dict[str, str]],
-    validation_model: type[T],
+    log_file_name: str,
+    validation_model: type[T] | None = None,
     model_settings: StageOverrideSettings | None = None,
 ) -> (type[T | SS] | list[type[T]], float):
 
     # Get the default settings.
-    llm_settings: dict = settings.LLM.model_dump(mode="python")
+    llm_settings: dict = settings.llm.model_dump(mode="python")
     # Update default settings with stage-specific settings.
     if model_settings:
         llm_settings.update(model_settings.model_dump(mode="python", exclude_unset=True))
 
     start = time.time()
     attempt = 0
-    max_retries = settings.LLM_INVALID_OUTPUT_RETRY_COUNT
+    max_retries = settings.llm_invalid_output_retry_count
 
     while attempt < max_retries:
         content = call_llm(
             client=client,
             messages=messages,
-            response_format=create_json_schema(validation_model),
+            response_format=create_json_schema(validation_model) if validation_model else None,
             llm_settings=llm_settings,
         )
 
@@ -75,7 +81,7 @@ def get_validated_llm_output(
             break
 
         except pydantic.ValidationError as err:
-            log.error(f"GeneralData ValidationError: {err}")
+            log.error(f"ValidationError: {err}")
             attempt += 1
 
     else:
@@ -95,10 +101,11 @@ def call_llm(client: Client, messages: list[dict[str, str]], response_format: di
 
     :param client: OpenAI Client object. Used to make calls to the LLM.
     :param messages: Array of {"role": "system|user", "content": "to LLM str"}
+    :param llm_settings:
     :param response_format: Optional[dict] json schema for the LLM to output using. Requires platform/model to support
                             "Structured Output"
     """
-    max_retries = settings.LLM_EMPTY_OUTPUT_RETRY_COUNT
+    max_retries = settings.llm_empty_output_retry_count
     retries = 0
 
     # Output the message contents for use in testing manually.
@@ -106,6 +113,8 @@ def call_llm(client: Client, messages: list[dict[str, str]], response_format: di
         log.debug(f"Message: {count} - Role: {message['role']} - Content: \n{message['content']}")
 
     log.debug(f"Structured Output Object: \n{json.dumps(response_format)}")
+
+    print(f"{response_format=}")
 
     log.debug(f"Calling LLM with settings: {llm_settings}")
     while retries < max_retries:
@@ -138,6 +147,7 @@ def call_llm(client: Client, messages: list[dict[str, str]], response_format: di
         output = remove_directional_single_quotes(output)
         output = remove_end_of_line_indicators(output)
         output = replace_em_dash_with_regular_dash(output)
+        output = process_out_non_utf8(output)
         output = output.strip()  # Reduces output that's all spaces and tabs into an empty string for validation.
 
         if response_format:  # Expectation is that the output will always be an object. Per structured output specs.

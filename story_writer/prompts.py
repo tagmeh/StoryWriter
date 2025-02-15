@@ -26,6 +26,7 @@ Who is the protagonist? What are their goals and motivations?
 Who or what is the antagonist? What is their goal?
 What are the main conflicts in the outline?
 What are the stakes of the story?
+Use the character's name in place of any pronoun.
 
 Be as detailed as possible.
 
@@ -49,6 +50,7 @@ Expand on each point in the story, adding details where appropriate. Avoid dialo
 Consider the protagonist's motivations and desires.
 What issues does the protagonist run into, how do they overcome them?
 Does anyone help or hinder the protagonist?
+Use the character's name in place of any pronoun.
 
 User Input:
 Title: {story_data.general.title}
@@ -62,6 +64,8 @@ def generate_worldbuilding_prompt(story_data: StoryData) -> str:
     instructions = f"""Describe the world and setting of the story. What's the tone of the story or this part of the 
 world? What are some key elements of the world that the story should acknowledge? Why is the worldbuilding details
 relevant to the story? How does the protagonist relate to the world or their area?
+
+Use the character's name in place of any pronoun.
 
 User Input:
 Title: {story_data.general.title}
@@ -84,12 +88,13 @@ def generate_story_characters_prompt(story_data: StoryData) -> str:
     :param story_data:
     :return:
     """
-    return f"""Generate a list of the characters in this story. Define the protagonist, their allies, love interests, friends,
-family, enemies, and people who pose as obstacles.
+    return f"""Generate a 3 to 7 characters for this story. Define the protagonist, their allies, any love interests, 
+friends, family, enemies, and people who pose as obstacles.
 
 What are the ages of these characters.
 Do they have any personality quirks that help define them?
 What sort of physical features make them stand out to the reader?
+Avoid pronouns, use the character's name instead.
 
 Define as many characters as possible.
 
@@ -103,13 +108,28 @@ Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.li
 """
 
 
+#     return f"""Generate a 3 to 7 characters for this story, creating their name, giving them an age, giving them a
+# role in the story, a short but detailed description, and a personality that influences the story.
+# Create the protagonist, their allies, any love interests, friends, family, enemies, and people who pose as obstacles.
+# Use the character's name in place of any pronoun
+#
+# Story Details:
+# Title: {story_data.general.title}
+# Themes: {", ".join(story_data.general.themes)}
+# Genre: {", ".join(story_data.general.genres)}
+# Synopsis: {story_data.general.synopsis}
+#
+# Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.list_key_values_str()}
+# """
+
+
 def generate_story_chapters_prompt(story_data: StoryData) -> str:
     """
 
     :param story_data:
     :return:
     """
-    return f"""Define {settings.CHAPTER_MINIMUM_COUNT + 1}, or more, chapters.
+    return f"""Define {settings.chapter_minimum_count + 1}, or more, chapters.
 Use the Title, Genres, Themes, story synopsis, and story structure to generate chapters.
 
 Define the chapter title.
@@ -118,6 +138,7 @@ Define the location the chapter takes place in.
 Define which characters feature in each chapter.
 What are the statuses of each character (ie, deceased, transformed, asleep, dazed, etc).
 Multiple chapters can cover the same story structure parts.
+Use the character's name in place of any pronoun.
 And finally, define the general chapter synopsis.
 
 Story Details:
@@ -131,13 +152,14 @@ Story Structure/Outline:\n{story_data.structure.style}\n{story_data.structure.li
 
 
 def generate_story_chapter_scene_prompt(story_data: StoryData, chapter: ChapterData) -> str:
-    return f"""Define {settings.SCENES_PER_CHAPTER_MINIMUM_COUNT + 1} or more scenes for this chapter. Scenes should expand 
+    return f"""Define {settings.scenes_per_chapter_minimum_count + 1} or more scenes for this chapter. Scenes should expand 
 on the chapter synopsis. Output response as JSON.
 
 Define a short summary of the scene.
 Define the characters and their statuses in the scene.
 Define the location the scene takes place in.
 Define a few story beats for this scene.
+Use the character's name in place of any pronoun.
 
 Themes: {", ".join(story_data.general.themes)}
 Genre: {", ".join(story_data.general.genres)}

@@ -1,5 +1,7 @@
 from story_writer.models.outline_models.story_structure_models.classic import ClassicStoryStructure
-from story_writer.models.outline_models.story_structure_models.dan_harmons_story_circle import DanHarmonsStoryCircleStructure
+from story_writer.models.outline_models.story_structure_models.dan_harmons_story_circle import (
+    DanHarmonsStoryCircleStructure,
+)
 from story_writer.models.outline_models.story_structure_models.fichtean_curve import FichteanCurveStructure
 from story_writer.models.outline_models.story_structure_models.five_act import FiveActStructure
 from story_writer.models.outline_models.story_structure_models.freytags_pyramid import FreytagsPyramidStoryStructure

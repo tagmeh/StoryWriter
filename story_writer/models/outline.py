@@ -48,8 +48,9 @@ class StoryData(CustomBaseModel):
         return f"{self.general.title}"
 
     def save_to_file(self, output_dir: Path, filename: str = None):
-        """ output_dir is the path to the story directory /stories/<story>/"""
-        if settings.CONSOLIDATE_SAVED_OUTPUT:
+        """output_dir is the path to the story directory /stories/<story>/"""
+        log.info(f"Saving {filename}.")
+        if settings.consolidate_saved_output:
             log.debug("Saving story outline data as one consolidated file.")
             super().save_to_file(output_dir=output_dir, filename="story_data")
         else:
@@ -65,7 +66,7 @@ class StoryData(CustomBaseModel):
                     # Create the subdirectory for the list of x
                     list_dir = output_dir / key
                     list_dir.mkdir(exist_ok=True)
-                    print(f"{value=}")
+
                     for character in self.__getattribute__(key):
                         print(f"{character=}")
                         character.save_to_file(output_dir=list_dir)

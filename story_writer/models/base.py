@@ -40,16 +40,16 @@ class CustomBaseModel(BaseModel):
         output_dir.mkdir(parents=True, exist_ok=True)
 
         file_path = output_dir / (
-            f"{filename}.{settings.SAVE_STORY_FILE_TYPE}"
-            or f"{self.__class__.__name__}.{settings.SAVE_STORY_FILE_TYPE}"
+            f"{filename}.{settings.save_story_file_type}"
+            or f"{self.__class__.__name__}.{settings.save_story_file_type}"
         )
         log.debug(f"Saving/Updating outline data to {file_path}")
         try:
-            if settings.SAVE_STORY_FILE_TYPE == "json":
+            if settings.save_story_file_type == "json":
                 with open(file_path, mode="w+", encoding="utf-8") as f:
                     json.dump(self.model_dump(mode="json"), f, indent=4)
 
-            elif settings.SAVE_STORY_FILE_TYPE == "yaml":
+            elif settings.save_story_file_type == "yaml":
                 with open(file_path, mode="w+", encoding="utf-8") as f:
                     yaml.dump(self.model_dump(mode="json"), f, default_flow_style=False, sort_keys=False)
 
@@ -65,15 +65,15 @@ class CustomBaseModel(BaseModel):
         :param filename: filename of the saved file.
         :return:
         """
-        file_path = story_dir / f"{filename}.{settings.SAVE_STORY_FILE_TYPE}"
+        file_path = story_dir / f"{filename}.{settings.save_story_file_type}"
         log.debug(f"Loading outline data from '{file_path}'")
 
         try:
-            if settings.SAVE_STORY_FILE_TYPE == "json":
+            if settings.save_story_file_type == "json":
                 with open(file_path, encoding="utf-8") as f:
                     data = json.load(f)
 
-            elif settings.SAVE_STORY_FILE_TYPE == "yaml":
+            elif settings.save_story_file_type == "yaml":
                 with open(file_path, encoding="utf-8") as f:
                     data = yaml.safe_load(f)
 

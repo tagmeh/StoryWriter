@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Annotated, Literal, TypeVar
+from typing import Annotated, TypeVar
 
 from pydantic import AfterValidator, BaseModel
 

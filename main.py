@@ -1,6 +1,5 @@
 from story_writer.cli import cli
 
-
 if __name__ == "__main__":
     # Local urls may be "127.0.0.1" or "localhost"
     # LM Studio: http://url:1234/v1

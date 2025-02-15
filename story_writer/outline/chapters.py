@@ -1,24 +1,25 @@
-from pathlib import Path
+import logging
 
 from openai import Client
 
-from story_writer import settings, utils
+from story_writer import settings
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import ChapterData
 from story_writer.prompts import generate_story_chapters_prompt
 
+log = logging.getLogger(__name__)
 
-def generate_chapters(client: Client, story_root: Path):
-    story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
+
+def generate_chapters(client: Client):
+    story_data: StoryData = StoryData.load_from_file(saved_dir=settings.story_dir)
 
     character_seed_str = ""
     for char_dict in [char.dict() for char in story_data.characters]:
         character_seed_str += ", ".join([f"{key}: {val}" for key, val in char_dict.items()])
 
-    model = settings.LLM.model
     messages = [
-        {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
+        {"role": "system", "content": settings.basic_system_prompt},
         {  # Seed data prior to chapter-generation instructions.
             "role": "user",
             "content": f"Story characters:\n{character_seed_str}",
@@ -27,7 +28,11 @@ def generate_chapters(client: Client, story_root: Path):
     ]
 
     content, elapsed = get_validated_llm_output(
-        client=client, messages=messages, validation_model=ChapterData, model_settings=settings.STAGE.CHAPTERS
+        client=client,
+        messages=messages,
+        validation_model=ChapterData,
+        model_settings=settings.stage.chapters,
+        log_file_name="generate_chapters",
     )
 
     for count, chapter in enumerate(content):
@@ -35,14 +40,15 @@ def generate_chapters(client: Client, story_root: Path):
 
     story_data.chapters = content
 
-    story_data.save_to_file(output_dir=story_root)
+    log.debug("Saving Chapter Outline Data.")
+    story_data.save_to_file(output_dir=settings.story_dir)
 
-    utils.log_step(
-        story_root=story_root,
-        messages=messages,
-        file_name="generate_chapters",
-        model=model,
-        settings={},
-        response_model=ChapterData,
-        duration=elapsed,
-    )
+    # utils.log_step(
+    #     story_root=story_root,
+    #     file_name="generate_chapters",
+    #     messages=messages,
+    #     model=model,
+    #     settings={},
+    #     response_model=ChapterData,
+    #     duration=elapsed,
+    # )

@@ -1,30 +1,27 @@
 import logging
-from pathlib import Path
 
 from openai import Client
 
-from story_writer import settings, utils
+from story_writer import settings
 from story_writer.llm import get_validated_llm_output
 from story_writer.models.outline import StoryData
 from story_writer.models.outline_models import SceneData
 from story_writer.prompts import generate_story_chapter_scene_prompt
 
-
 log = logging.getLogger(__name__)
 
 
-def generate_scenes_for_chapter(client: Client, story_root: Path):
+def generate_scenes_for_chapter(client: Client):
     """
     For each chapter, generate a few scenes based on the chapter synopsis, location, and characters.
     """
-    story_data: StoryData = StoryData.load_from_file(saved_dir=story_root)
+    story_data: StoryData = StoryData.load_from_file(saved_dir=settings.story_dir)
     log.debug(f"Generating Scenes for outline: {story_data.general.title}")
 
     # Generate a non-json string block to seed the context before each scene.
     character_seed_str = "".join([c.list_key_values_str() for c in story_data.characters])
 
-    model = settings.LLM.model
-    log.debug(f"Generating Scenes using model: {settings.LLM.model}")
+    log.debug(f"Generating Scenes using model: {settings.llm.model}")
     for chapter in story_data.chapters:
         story_structure_seed_str = (
             f"{story_data.structure.style}\n"
@@ -36,7 +33,7 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
 
         log.info(f"Generating scenes for chapter {chapter.number}.")
         messages = [
-            {"role": "system", "content": settings.BASIC_SYSTEM_PROMPT},
+            {"role": "system", "content": settings.basic_system_prompt},
             {
                 "role": "user",
                 "content": f"Characters: \n{character_seed_str}\nStory Structure/Outline: {story_structure_seed_str}",
@@ -47,18 +44,22 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
             },
         ]
 
-        max_retries = settings.SCENES_PER_CHAPTER_RETRY_COUNT
-        log.debug(f"Number of attempts to generate scenes: {settings.SCENES_PER_CHAPTER_RETRY_COUNT}")
+        max_retries = settings.scenes_per_chapter_retry_count
+        log.debug(f"Number of attempts to generate scenes: {settings.scenes_per_chapter_retry_count}")
         attempts = 0
         while attempts < max_retries:
             log.debug(f"Attempt {attempts} at generating scenes for chapter {chapter.number}")
             content, elapsed = get_validated_llm_output(
-                client=client, messages=messages, validation_model=SceneData, model_settings=settings.STAGE.SCENES
+                client=client,
+                messages=messages,
+                validation_model=SceneData,
+                model_settings=settings.stage.scenes,
+                log_file_name=f"generate_scenes_for_chapter_{chapter.number}",
             )
 
-            if len(content) < settings.SCENES_PER_CHAPTER_MINIMUM_COUNT:
+            if len(content) < settings.scenes_per_chapter_minimum_count:
                 log.warning(
-                    f"LLM returned fewer than {settings.SCENES_PER_CHAPTER_MINIMUM_COUNT} "
+                    f"LLM returned fewer than {settings.scenes_per_chapter_minimum_count} "
                     f"scenes for chapter {chapter.number}. This is a user-setting. If the LLM model "
                     f"continues to fail, try updating the scene-generator prompt or lowering the minimum "
                     f"scenes per chapter in config/story_settings.py - SCENES_PER_CHAPTER_MINIMUM_COUNT. "
@@ -78,15 +79,15 @@ def generate_scenes_for_chapter(client: Client, story_root: Path):
 
         chapter.scenes = content
 
-        story_data.save_to_file(output_dir=story_root)
+        story_data.save_to_file(output_dir=settings.story_dir)
 
-        utils.log_step(
-            story_root=story_root,
-            messages=messages,
-            file_name=f"generate_scenes_for_chapter_{chapter.number}",
-            model=model,
-            settings={},
-            response_model=SceneData,
-            duration=elapsed,
-        )
+        # utils.log_step(
+        #     story_root=story_root,
+        #     messages=messages,
+        #     file_name=f"generate_scenes_for_chapter_{chapter.number}",
+        #     model=model,
+        #     settings={},
+        #     response_model=SceneData,
+        #     duration=elapsed,
+        # )
     log.info("Scenes generated for all chapters. Story outline is complete.")
