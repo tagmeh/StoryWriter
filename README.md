@@ -1,134 +1,248 @@
-## This page is still under heavy editing. 
+<a id="readme-top"></a>
 
-# StoryWriter
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
 
-StoryWriter's goal is to generate a full story, given an initial prompt. The script uses a multi-stage approach, where the user can configure the LLM model settings for each stage independently. Once the script runs through each stage and has generated the outline, the user can review/edit the outline as they see fit. Then the process continues with a rough draft, again with user-configurable settings. Then, depending on what the user wants, multiple additional passes can be made to refine the output, adding detail, flowery language, dialogue. 
 
-## Table of Contents
 
-- [Features](#features)
-- [Installation](#installation)
-  - [Prerequisites](#prerequisites)
-- [Usage](#usage)
-    * [`prompt.txt` Configuration File](#prompptxt-configuration-file)
-    * [`config.yaml` LLM Settings Configurations](#confiyaml-lm-settings-configurations)
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Tagmeh/StoryWriter">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
-## Features
+<h3 align="center">StoryWriter</h3>
 
-While this script will output a story, it will only be as good as the model used. 
-Each stage in the outline, rough draft, and subsequent editorial passes have user-define settings. You can use more logical models for the story structure outline phase, and a more creative model for the rough draft. You can set the system prompt for the dialogue stage to tweak how dialogue is inserted into the story.
+  <p align="center">
+    StoryWriter's goal is to generate a full story, given an initial prompt. The script uses a multi-stage approach, where the user can configure the LLM model settings for each stage independently. Once the script runs through each stage and has generated the outline, the user can review/edit the outline as they see fit. Then the process continues with a rough draft, again with user-configurable settings. Then, depending on what the user wants, multiple additional passes can be made to refine the output, adding detail, flowery language, dialogue.
+    <br />
+    <a href="https://github.com/Tagmeh/StoryWriter"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/Tagmeh/StoryWriter">View Demo</a>
+    &middot;
+    <a href="https://github.com/Tagmeh/StoryWriter/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/Tagmeh/StoryWriter/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
 
-1. **Edit `prompt.txt`**: Easily edit the story prompt located at `/stories/`.
-2. **LLM Model Configuration**:
-    * Configure different LLM models for each stage.
-3. **Stage-wise Generation** (e.g., "General Story Data",  "Story Structure", etc.)
-4. **Character Creation**
-5. **Worldbuilding**: Define cultures, religions and geography
-6. **Chapter Outline with Scenes**
 
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
+
+Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `Tagmeh`, `StoryWriter`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `StoryWriter`, `StoryWriter's goal is to generate a full story, given an initial prompt. The script uses a multi-stage approach, where the user can configure the LLM model settings for each stage independently. Once the script runs through each stage and has generated the outline, the user can review/edit the outline as they see fit. Then the process continues with a rough draft, again with user-configurable settings. Then, depending on what the user wants, multiple additional passes can be made to refine the output, adding detail, flowery language, dialogue.`, `MIT License`
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Built With
+
+* [![Next][Next.js]][Next-url]
+* [![React][React.js]][React-url]
+* [![Vue][Vue.js]][Vue-url]
+* [![Angular][Angular.io]][Angular-url]
+* [![Svelte][Svelte.dev]][Svelte-url]
+* [![Laravel][Laravel.com]][Laravel-url]
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![JQuery][JQuery.com]][JQuery-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- GETTING STARTED -->
 ## Getting Started
-- User edits the `/stories/prompt.txt` creating a premise for a story.
-- User updates the `config.yaml` settings file. The only required setting is the model name being used. However, the settings default to a local LM Studio instance. You can edit this in the `config.yaml`. An example file is included in the repository.
-- Run main.py
 
-## Script Process
-1. Generates some general data. Ie. Title, Genres, Themes, and an expanded synoposis.
-2. Given the user-definable Story Structure option, generates each step in the story structure. (Things like Three Act Story, Dan Harmon's Story Circle, Freytag's Pyramid, ex)
-
-## Settings
-
-### Story Structures
-***Disclaimer Some of these story structures do poorly in an LLM, particularly Dan Harmon's Story Circle. As it was defined when I found it, each stage was named with a single word. Smaller models just return the next closest word to the story step, which doesn't make for a good story.***
-
-List of story structures
-- **Classic**: 
-- **Dan Harmon's Story Circle**:
-- **Fichtean Curve**:
-- **Five Act**
-- **Freytag's Pyramid**
-- **In Medias Res**
-- **Save The Cat**
-- **Seven Point**
-- **Story Spine**
-- **The Hero's Journey**
-- **Three Act** 
-
-## Installation
-
+This is an example of how you may give instructions on setting up your project locally.
+To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-Before you begin, ensure that you have the following installed:
-- Python (version X.X or above)
-- Required dependencies: [List of Dependencies]
+This is an example of how to list things you need to use the software and how to install them.
+* npm
+  ```sh
+  npm install npm@latest -g
+  ```
 
-To install required packages:
+### Installation
 
-```bash
-pip3 install -r requirements.txt  # Update this command as needed.
-```
+1. Get a free API Key at [https://example.com](https://example.com)
+2. Clone the repo
+   ```sh
+   git clone https://github.com/Tagmeh/StoryWriter.git
+   ```
+3. Install NPM packages
+   ```sh
+   npm install
+   ```
+4. Enter your API in `config.js`
+   ```js
+   const API_KEY = 'ENTER YOUR API';
+   ```
+5. Change git remote url to avoid accidental pushes to base project
+   ```sh
+   git remote set-url origin Tagmeh/StoryWriter
+   git remote -v # confirm the changes
+   ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
 ## Usage
 
-The StoryWriter script allows users to generate a complete story outline and narrative by configuring two key files:
-### `prompt.txt` Configuration File
+Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
-Located at `/stories/`, edit the prompt file for initial storytelling prompts.
+_For more examples, please refer to the [Documentation](https://example.com)_
 
-Example:
-
-```text
-Title: My Epic Adventure
-Genre(s): Fantasy, Action
-Theme(S):
-Synopsis: A hero's journey through a magical land.
-```
-
-### `config.yaml` LLM Settings Configurations
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-This YAML configuration is used to define various settings and parameters required by the Large Language Models (LLMs):
 
-```yaml
+<!-- ROADMAP -->
+## Roadmap
 
-llm_model:
-  default_settings:
+- [ ] Feature 1
+- [ ] Feature 2
+- [ ] Feature 3
+    - [ ] Nested Feature
 
-    # Default fallback model configurations
-      name: "default-model"
-      api_key: 'your_api_key_here'
-        endpoint_url : 'https://api.example.com'
+See the [open issues](https://github.com/Tagmeh/StoryWriter/issues) for a full list of proposed features (and known issues).
 
-# Model Settings for each stage of story generation.
-general_data_creation :
-     llm_name:"model-for-general-data"
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-story_structure:
-   # Add configuration specific to this model and setting
-```
 
-### Supported Platforms
 
-StoryWriter supports the following LLM platforms:
+<!-- CONTRIBUTING -->
+## Contributing
 
-* Ollama
-* ChatGPT (OpenAI)
-* LM Studio
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Top contributors:
+
+<a href="https://github.com/Tagmeh/StoryWriter/graphs/contributors">
+;:  <img src="https://contrib.rocks/image?repo=Tagmeh/StoryWriter" alt="contrib.rocks image" />
+</a>
+
+
+
+<!-- LICENSE -->
 ## License
 
-This project is licensed under MIT.
+Distributed under the MIT License. See `LICENSE.txt` for more information.
 
----
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Feel free to contribute, report issues or suggest new features. Happy writing!
 
-## Todo:
-- [ ] Capture and log usage data when using LM Studio
-  - Review current data capture and improve on the implementation and data logging.
-- [ ] Add option to save Outline data as yaml or json.
-- [ ] Add option to save Outline as one file or separate files (for easier manual editing.)
-- [ ] Update the Character model in the Outline to better capture the character's motivation, status, other details. Per chapter and per scene.
 
-- [ ] Might try to create a graphical or textual interface.
-- [ ] And of course, the various TODOs I have within the code =D.
+<!-- CONTACT -->
+## Contact
+
+John - email@email_client.com
+
+Project Link: [https://github.com/Tagmeh/StoryWriter](https://github.com/Tagmeh/StoryWriter)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* []()
+* []()
+* []()
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/Tagmeh/StoryWriter.svg?style=for-the-badge
+[contributors-url]: https://github.com/Tagmeh/StoryWriter/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Tagmeh/StoryWriter.svg?style=for-the-badge
+[forks-url]: https://github.com/Tagmeh/StoryWriter/network/members
+[stars-shield]: https://img.shields.io/github/stars/Tagmeh/StoryWriter.svg?style=for-the-badge
+[stars-url]: https://github.com/Tagmeh/StoryWriter/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Tagmeh/StoryWriter.svg?style=for-the-badge
+[issues-url]: https://github.com/Tagmeh/StoryWriter/issues
+[license-shield]: https://img.shields.io/github/license/Tagmeh/StoryWriter.svg?style=for-the-badge
+[license-url]: https://github.com/Tagmeh/StoryWriter/blob/master/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/linkedin_username
+[product-screenshot]: images/screenshot.png
+[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[Next-url]: https://nextjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.io/
+[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
+[Svelte-url]: https://svelte.dev/
+[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[Laravel-url]: https://laravel.com
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com
+[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
+[JQuery-url]: https://jquery.com 

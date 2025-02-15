@@ -41,7 +41,7 @@ python_version = "3.10"
 disallow_untyped_defs = true
 ignore_missing_imports = true
 strict = true
-exclude = ["tests", "docs", "stories"]
+exclude = ["tests", "stories"]
 plugins = ['pydantic.mypy']
 
 [tool.coverage.run]
