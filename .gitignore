@@ -7,5 +7,7 @@
 
 config.yaml
 /.coverage
+/coverage_html_report/
 
 __pycache__
+/StoryWriter.egg-info/
